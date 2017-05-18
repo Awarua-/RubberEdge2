@@ -1,0 +1,32 @@
+{
+  "name": "rubberedge2",
+  "version": "1.0.0",
+  "description": "Modern take on the rubberedge trackpad experiment",
+  "main": "main.js",
+  "scripts": {
+    "start": "main.js",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Awarua-/RubberEdge2.git"
+  },
+  "author": "Dion Woolley",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Awarua-/RubberEdge2/issues"
+  },
+  "homepage": "https://github.com/Awarua-/RubberEdge2#readme",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.2",
+    "ws": "^2.3.1"
+  },
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^3.19.0",
+    "eslint-plugin-node": "^4.2.2"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "name": "rubberedge2",
+  "short_name": "rubberedge2",
+  "description": "Modern take of the rubberedge experiment",
+  "start_url": "/",
+  "display": "standalone"
+}

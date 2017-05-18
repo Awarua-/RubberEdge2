@@ -1,0 +1,118 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<!--<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">-->
+<!-- <link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html"> -->
+
+<dom-module id="view-fitts">
+    <template>
+    <style>
+    :host {
+        display: block;
+        cursor: none;
+    }
+    #area {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+
+    </style>
+    <div id="area">
+    </div>
+</template>
+
+<script>
+/** @polymerElement */
+class ViewFitts extends Polymer.Element {
+    static get is() { return 'view-fitts'; }
+    static get properties() {
+        return {
+            mouse: {
+                type: Object,
+                observer: '_updateCursorPosition'
+            },
+            testAreaSVG: Object,
+            testDimension: Object,
+            area: {
+                type: Object,
+                observer: '_addCursor'
+            },
+            cursor: Object,
+            log: {
+                type: Object,
+                notify: true
+            }
+        };
+    }
+
+    ready() {
+        super.ready();
+        this._createElements();
+    }
+
+    _createElements() {
+        this.testDimension = this._makeDimension(window.innerWidth,  window.innerHeight, 30, 30, 30, 30);
+        this.area = d3.select(this.$.area).append('svg');
+        this.area.attr('width', this.testDimension.width).attr('height', this.testDimension.height);
+    }
+
+    _addCursor(newValue, oldValue) {
+        this.cursor = this.area.append("image");
+        this.cursor
+        .attr("xlink:href", "../../src/images/cursor.svg")
+        .attr("width", 16)
+        .attr("height", 16)
+        .attr("x", this.testDimension.width / 2)
+        .attr("y", this.testDimension.height / 2)
+        .attr("z", -1000)
+    }
+
+    _updateCursorPosition() {
+        let currentx = parseInt(this.cursor.attr('x'));
+        let currenty = parseInt(this.cursor.attr('y'));
+        currentx += this.mouse.dx;
+        currenty += this.mouse.dy;
+
+        // Don't allow the cursor image to go beyond the bounds of the window.
+        if (currentx < 0 || currenty < 0 || currentx > this.testDimension.width - parseInt(this.cursor.attr("width")) || currenty > this.testDimension.height - parseInt(this.cursor.attr("height"))) {
+            return;
+        }
+        this.cursor.attr('x', currentx);
+        this.cursor.attr('y', currenty);
+    }
+
+    /**
+    * Create dimensions from the given values and store them for later use.
+    * All values should be positive and make sense.
+    * @param {number} width The outer width of the area.
+    * @param {number} height The outer height of the area.
+    * @param {number} top Margin form the top edge.
+    * @param {number} right Margin form the right edge.
+    * @param {number} bottom Margin form the bottom edge.
+    * @param {number} left Margin form the left edge.
+    */
+    _makeDimension(width, height, top, right, bottom, left) {
+        return {width: width,
+            height: height,
+            innerWidth: width - (left + right),
+            innerHeight: height - (top + bottom),
+            top: top,
+            right: right,
+            bottom: bottom,
+            left: left,
+            cx: (width - (left + right)) / 2 + left,
+            cy: (height - (top + bottom)) / 2 + top};
+        }
+
+        _bgRect(d, dim) {
+            return d.append('rect')
+            .attr('cx', 0)
+            .attr('cy', 0)
+            .attr('width', dim.width)
+            .attr('height', dim.height)
+            .attr('class', 'back');
+        }
+    }
+
+    window.customElements.define(ViewFitts.is, ViewFitts);
+    </script>
+</dom-module>

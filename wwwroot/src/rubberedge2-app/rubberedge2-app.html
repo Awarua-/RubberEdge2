@@ -1,0 +1,174 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/websocket-component/websocket-component.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/app-route/app-location.html">
+<link rel="import" href="../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+
+<link rel="lazy-import" href="view-instructions.html">
+<link rel="lazy-import" href="view-presurvey.html">
+<link rel="lazy-import" href="view-calibration.html">
+<link rel="lazy-import" href="view-fitts.html">
+<link rel="lazy-import" href="view-wait.html">
+<link rel="lazy-import" href="view-postsurvey.html">
+<link rel="lazy-import" href="view-thanks.html">
+<link rel="lazy-import" href="view-404.html">
+
+<dom-module id="rubberedge2-app">
+    <template>
+    <style>
+    :host {
+        display: block;
+        cursor: none;
+    }
+
+    </style>
+
+    <app-location route="{{route}}"></app-location>
+    <app-route
+    route="{{route}}"
+    pattern="[[rootPattern]]:page"
+    data="{{routeData}}"
+    tail="{{subroute}}"></app-route>
+
+    <iron-pages
+    selected="[[page]]"
+    attr-for-selected="name"
+    fallback-selection="view-404"
+    role="main">
+    <view-instructions name="view-instructions"></view-instructions>
+    <view-presurvey name="view-presurvey"></view-presurvey>
+    <view-calibration name="view-calibration"></view-calibration>
+    <view-fitts name="view-fitts" mouse="[[mouse]]" log="{{log}}"></view-fitts>
+    <view-wait name="view-wait"></view-wait>
+    <view-postsurvey name="view-postsurvey"></view-postsurvey>
+    <view-thanks name="view-thanks"></view-thanks>
+    <view-404 name="view-404"></view-404>
+</iron-pages>
+
+<iron-ajax
+id="ajax"
+auto
+url="{{_computeHTTPUrl('/transferFunctions')}}"
+handle-as="json"
+last-response="{{transferFunctions}}"></iron-ajax>
+
+<iron-ajax
+id="ajaxPost"
+url="{{_computeHTTPUrl('/transferFunctions')}}"
+handle-as="json"
+content-type="application/json"
+method="POST"></iron-ajax>
+
+<websocket-component id="websocket" url="{{urlWS}}" auto></websocket-component>
+</template>
+
+<script>
+/** @polymerElement */
+class Rubberedge2App extends Polymer.Element {
+    static get is() { return 'rubberedge2-app'; }
+    static get properties() {
+        return {
+            mouse: {
+                type: Object,
+                notify: true
+            },
+            transferFunctions: Object,
+            urlWS: {
+                type: String,
+                computed: '_computeWSUrl(3001)'
+            },
+            page: {
+                type: String,
+                reflectToAttribute: true,
+                observer: '_pageChanged',
+            },
+            log: Object,
+            rootPattern: String,
+            routeData: Object,
+            subroute: String,
+        };
+    }
+
+    static get observers() {
+        return [
+            '_routePageChanged(routeData.page)',
+            '_log(log.*)'
+        ];
+    }
+
+    constructor() {
+        super();
+        // Get root pattern for app-route, for more info about `rootPath` see:
+        // https://www.polymer-project.org/2.0/docs/upgrade#urls-in-templates
+        this.rootPattern = (new URL(this.rootPath)).pathname;
+    }
+
+    _routePageChanged(page) {
+        // Polymer 2.0 will call with `undefined` on initialization.
+        // Ignore until we are properly called with a string.
+        if (page === undefined) {
+            return;
+        }
+        // If no page was found in the route data, page will be an empty string.
+        // Deault to 'view1' in that case.
+        this.page = page || 'view-fitts';
+    }
+
+    _pageChanged(page) {
+        // Load page import on demand. Show 404 page if fails
+        var resolvedPageUrl = this.resolveUrl(page + '.html');
+        Polymer.importHref(
+            resolvedPageUrl,
+            null,
+            this._showPage404.bind(this),
+            true);
+        }
+
+        _showPage404() {
+            this.page = 'view-404';
+        }
+
+        ready() {
+            super.ready();
+            this.$.websocket.addEventListener('websocket-message', e => this._updateMessage(e));
+            this.$.websocket.addEventListener('websocket-open', e => this._socketOpen(e));
+
+            setTimeout(() => {
+                this._functionChanged("system");
+            }, 5000);
+        }
+
+        _log(log) {
+            this.$.websocket.send(JSON.stringify(log));
+        }
+
+        _ajaxResponse(event, detail) {
+            console.log(event);
+            console.log(this.transferFunctions);
+        }
+
+        _functionChanged(functionName) {
+            this.$.ajaxPost.body = {"type": "transferFunction", "data": functionName};
+            this.$.ajaxPost.generateRequest();
+        }
+
+        _computeWSUrl(port) {
+            return 'ws://' + window.location.hostname + ':' + port;
+        }
+
+        _computeHTTPUrl(path) {
+            return window.location.origin + path;
+        }
+
+        _updateMessage(event) {
+            this.set('mouse', JSON.parse(event.detail.data));
+        }
+
+        _socketOpen(event) {
+            console.log("socket open");
+        }
+    }
+    window.customElements.define(Rubberedge2App.is, Rubberedge2App);
+    </script>
+</dom-module>
