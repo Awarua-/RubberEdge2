@@ -14,7 +14,7 @@ class RubberEdge {
         }
 
         // Mapping to transfer functions
-        this.transferFunctions = [{"name": "system", "function": this._composeFunction("system:?epp=1"), "active": true},
+        this.transferFunctions = [{"name": "system", "function": this._composeFunction("system:?slider=-2&epp=true"), "active": true},
                                      {"name": "constant", "function": this._composeFunction("constant:?cdgain=1"), "active": false},
                                 {"name": "rubberedge", "function": this._composeFunction("interp:" + rubberEdgeFunctionDir), "active": false}];
 
@@ -24,7 +24,7 @@ class RubberEdge {
         // by default set the transferFunction to the selected one
         this.tFunc = new pointing.TransferFunction(this.transferFunctions.filter(v => {if (v.name === "system") {return true}})[0].function, this.input, this.output);
         //this.tFunc.setSubPixeling(true);
-        this._setupCallback();
+        //this._setupCallback();
     }
 
     _composeFunction(uri) {
@@ -39,13 +39,26 @@ class RubberEdge {
         return uri;
     }
 
+
+    //FIXME Dead code below, used with trackpad
     _setupCallback() {
-        this.input.setPointingCallback((timestamp, dx, dy, buttons) => {
+        this.input.setPointingCallback((timestamp, dx, dy, buttons, x, y) => {
             let pixels = this.tFunc.applyd(dx, dy, timestamp);
             if (this.callback) {
-                this.callback({dx: pixels.dx, dy: pixels.dy, timestamp: timestamp});
+                this.callback({dx: pixels.dx, dy: pixels.dy, timestamp: timestamp, button: buttons});
             }
         });
+    }
+
+    updatePosition(data) {
+        let pixels = this.tFunc.applyd(data.dx, data.dy, data.timestamp),
+            isEnd = false;
+        if (data.eventType === "touchEnd") {
+            isEnd = true;
+        }
+        if (this.callback) {
+            this.callback({dx: pixels.dx, dy: pixels.dy, timestamp: data.timestamp, end: isEnd});
+        }
     }
 
     changeTransferFunction(data) {

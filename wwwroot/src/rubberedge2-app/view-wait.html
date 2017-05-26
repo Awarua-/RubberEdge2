@@ -1,15 +1,25 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-timer/iron-timer.html">
 
 <dom-module id="view-wait">
   <template>
-    <style>
-      :host {
-        display: block;
-        padding: 10px 20px;
-      }
-    </style>
+  <style include="shared-styles">
+  :host {
+      height: 100%;
+      @apply --layout-vertical;
+      @apply --layout-flex;
+  }
 
-    Oops you hit a 404. <a href="[[rootPath]]">Head back to home.</a>
+  #content {
+      @apply --layout-horizontal;
+      @apply --layout-center-justified;
+  }
+  </style>
+
+
+  <div id="content">
+      <iron-timer id="timer" start-time="5" current-time="{{currentTime}}" on-iron-timer-end="_next">[[currentTime]]</iron-timer>
+  </div>
   </template>
 
   <script>
@@ -20,7 +30,16 @@
           // This shouldn't be neccessary, but the Analyzer isn't picking up
           // Polymer.Element#rootPath
           rootPath: String,
+          currentTime: Number,
+
         };
+      }
+      ready() {
+          super.ready();
+          this.$.timer.start();
+      }
+      _next() {
+        this.dispatchEvent(new CustomEvent('next', {bubbles: true, composed: true}));
       }
     }
     window.customElements.define(ViewWait.is, ViewWait);

@@ -2,14 +2,35 @@
 
 <dom-module id="view-calibration">
   <template>
-    <style>
+      <style include="shared-styles">
       :host {
-        display: block;
-        padding: 10px 20px;
+          height: 100%;
+          @apply --layout-vertical;
+          @apply --layout-flex;
       }
-    </style>
 
-    Oops you hit a 404. <a href="[[rootPath]]">Head back to home.</a>
+      #next {
+          @apply --layout-horizontal;
+          @apply --layout-center-justified;
+          @apply --layout-end;
+          padding-bottom: 2rem;
+      }
+
+      #content {
+          @apply --layout-flex
+          padding-left: 1rem;
+      }
+      </style>
+
+
+      <div id="content">
+          <p>
+              Lets talk about stuff
+          </p>
+      </div>
+      <div id="next">
+          <paper-button raised on-tap="_next">Next</paper-button>
+      </div>
   </template>
 
   <script>
@@ -22,6 +43,10 @@
           rootPath: String,
         };
       }
+
+    _next() {
+      this.dispatchEvent(new CustomEvent('next', {bubbles: true, composed: true}));
+    }
     }
     window.customElements.define(ViewCalibration.is, ViewCalibration);
   </script>

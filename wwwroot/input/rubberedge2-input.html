@@ -1,0 +1,133 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/websocket-component/websocket-component.html">
+
+
+<dom-module id="rubberedge2-input">
+    <template>
+    <style>
+    :host {
+        display: block;
+        height: 100vh;
+    }
+
+    </style>
+
+    <websocket-component id="websocket" url="{{urlWS}}" auto></websocket-component>
+</template>
+
+<script>
+/**
+    * @customElement
+    * @polymer
+    * @extends Polymer.Element
+    * @appliesMixin Polymer.LazyImportsMixin
+    */
+class Rubberedge2Input extends Polymer.Element {
+    static get is() { return 'rubberedge2-input'; }
+    static get properties() {
+        return {
+            mouse: {
+                type: Object,
+                notify: true
+            },
+            urlWS: {
+                type: String,
+                computed: '_computeWSUrl(3001)'
+            },
+            touch: {
+                type: Object,
+                value: {}
+            }
+        };
+    }
+
+    static get observers() {
+        return [
+            '_log(log.*)'
+        ];
+    }
+
+    constructor() {
+        super();
+        // Get root pattern for app-route, for more info about `rootPath` see:
+        // https://www.polymer-project.org/2.0/docs/upgrade#urls-in-templates
+        this.rootPattern = (new URL(this.rootPath)).pathname;
+    }
+
+    ready() {
+        super.ready();
+        //this.$.websocket.addEventListener('websocket-message', e => this._updateMessage(e));
+        this.$.websocket.addEventListener('websocket-open', e => this._socketOpen(e));
+        this.addEventListener('touchstart', e => this._handleStart(e));
+        this.addEventListener('touchend', e => this._handleEnd(e));
+        this.addEventListener('touchcancel', e => this._handleCancel(e));
+        this.addEventListener('touchmove', e => this._handleMove(e));
+    }
+
+    _handleStart(event) {
+        //event.preventDefault();
+        let touchEvent = event.changedTouches[0];
+        //the Indentifier value of the touch event depends on the implementation by the browser. For example Firefox will report [0-9], relative to the number of simulaneous touch targets.
+        //Safari starts with a large negative value and increments it for every touch interaction.
+        //So the Indentifier can not be used to seperate input from different fingers across browsers.
+        //FIXME Assumption that all touch events will only be from one finger.
+
+        // Swap the x and y coordinates due to phone screen being rotation locked.
+        let touch = {x: touchEvent.screenY, y: touchEvent.screenX, dx: 0, dy: 0, timestamp: event.timeStamp, dt: 0};
+        this.set('touch', touch);
+        this._log({"type": "touch", "data": {"eventType": "touchStart", "x": touch.x, "y": touch.y, "id": touchEvent.identifier, "timestamp": event.timeStamp}});
+    }
+
+    _handleEnd(event) {
+        //event.preventDefault();
+        let touchEvent = event.changedTouches[0];
+        let touch = this.touch;
+        this._log({"type": "touch", "data": {"eventType": "touchEnd", "x": touch.x, "y": touch.y, "id": touchEvent.identifier, "timestamp": event.timeStamp}});
+    }
+
+    _handleCancel(event) {
+        this._handleEnd(event);
+
+        // Should the cancel and end event be the same, are they the same?
+    }
+
+    _moveTouch(touch, timestamp) {
+        let current = this.touch,
+            dx = touch.screenY - current.x,
+            dy = current.y - touch.screenX,
+            dt = timestamp - current.timestamp;
+
+        current.x = touch.screenY;
+        current.y = touch.screenX;
+        current.dx = dx;
+        current.dy = dy;
+        current.dt = dt;
+        current.timestamp = timestamp;
+
+        this.touch = current;
+
+        current.eventType = "touchMove";
+        this._log({"type": "touch", "data": current});
+    }
+
+    _handleMove(event) {
+        event.preventDefault();
+        let touchEvent = event.changedTouches[0];
+        this._moveTouch(touchEvent, event.timeStamp);
+    }
+
+    _log(log) {
+        this.$.websocket.send(JSON.stringify(log));
+    }
+
+    _computeWSUrl(port) {
+        return 'ws://' + window.location.hostname + ':' + port;
+    }
+
+    _socketOpen(event) {
+        console.log("socket open");
+    }
+    }
+    window.customElements.define(Rubberedge2Input.is, Rubberedge2Input);
+    </script>
+</dom-module>

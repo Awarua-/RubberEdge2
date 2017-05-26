@@ -1,26 +1,57 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/lazy-imports/lazy-imports-mixin.html">
 <link rel="import" href="../../bower_components/websocket-component/websocket-component.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/app-route/app-location.html">
 <link rel="import" href="../../bower_components/app-route/app-route.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../../bower_components/app-layout/app-header-layout/app-header-layout.html">
 
-<link rel="lazy-import" href="view-instructions.html">
-<link rel="lazy-import" href="view-presurvey.html">
-<link rel="lazy-import" href="view-calibration.html">
-<link rel="lazy-import" href="view-fitts.html">
-<link rel="lazy-import" href="view-wait.html">
-<link rel="lazy-import" href="view-postsurvey.html">
-<link rel="lazy-import" href="view-thanks.html">
-<link rel="lazy-import" href="view-404.html">
+<link rel="import" href="shared-styles.html">
 
 <dom-module id="rubberedge2-app">
+    <link rel="lazy-import" group="instructions" href="view-instructions.html">
+    <link rel="lazy-import" group="presurvey" href="view-presurvey.html">
+    <link rel="lazy-import" group="calibration" href="view-calibration.html">
+    <link rel="lazy-import" group="fitts" href="view-fitts.html">
+    <link rel="lazy-import" group="wait" href="view-wait.html">
+    <link rel="lazy-import" group="postsurvey" href="view-postsurvey.html">
+    <link rel="lazy-import" group="thanks" href="view-thanks.html">
+    <link rel="lazy-import" group="404" href="view-404.html">
     <template>
-    <style>
+    <style include="shared-styles">
     :host {
         display: block;
+        height: 100vh;
+    }
+
+    .content {
+        @apply --layout-vertical;
+      @apply --layout-flex;
+    }
+
+    app-header {
+        padding-top: 1rem;
+        background-color: var(--app-primary-colour);
+        color: var(--text-secondary-colour);
+        padding-bottom: 1rem;
+        padding-left: 1rem;
+        text-transform: uppercase;
+        font-size: 18px;
         cursor: none;
     }
+
+    footer {
+      height: 50px;
+      line-height: 50px;
+      text-align: center;
+      background-color: white;
+      font-size: 14px;
+      cursor: none;
+    }
+
 
     </style>
 
@@ -31,41 +62,61 @@
     data="{{routeData}}"
     tail="{{subroute}}"></app-route>
 
-    <iron-pages
-    selected="[[page]]"
-    attr-for-selected="name"
-    fallback-selection="view-404"
-    role="main">
-    <view-instructions name="view-instructions"></view-instructions>
-    <view-presurvey name="view-presurvey"></view-presurvey>
-    <view-calibration name="view-calibration"></view-calibration>
-    <view-fitts name="view-fitts" mouse="[[mouse]]" log="{{log}}"></view-fitts>
-    <view-wait name="view-wait"></view-wait>
-    <view-postsurvey name="view-postsurvey"></view-postsurvey>
-    <view-thanks name="view-thanks"></view-thanks>
-    <view-404 name="view-404"></view-404>
-</iron-pages>
+    <app-header-layout fullbleed>
 
-<iron-ajax
-id="ajax"
-auto
-url="{{_computeHTTPUrl('/transferFunctions')}}"
-handle-as="json"
-last-response="{{transferFunctions}}"></iron-ajax>
+    <app-header id="header" slot="header">
+        [[page]]
+      </app-header>
 
-<iron-ajax
-id="ajaxPost"
-url="{{_computeHTTPUrl('/transferFunctions')}}"
-handle-as="json"
-content-type="application/json"
-method="POST"></iron-ajax>
+      <div class="content">
+          <iron-pages
+          class="content"
+          selected="[[page]]"
+          attr-for-selected="name"
+          fallback-selection="404"
+          role="main">
+              <view-instructions name="instructions"></view-instructions>
+              <view-presurvey name="presurvey"></view-presurvey>
+              <view-calibration name="calibration"></view-calibration>
+              <view-fitts name="fitts" mouse="[[mouse]]" log="{{log}}"></view-fitts>
+              <view-wait name="wait"></view-wait>
+              <view-postsurvey name="postsurvey"></view-postsurvey>
+              <view-thanks name="thanks"></view-thanks>
+              <view-404 name="404"></view-404>
+          </iron-pages>
+      </div>
 
-<websocket-component id="websocket" url="{{urlWS}}" auto></websocket-component>
+      <footer id="footer">
+        &copy; Dion Woolley
+      </footer>
+
+    </app-header-layout>
+
+    <iron-ajax
+    id="ajax"
+    auto
+    url="{{_computeHTTPUrl('/transferFunctions')}}"
+    handle-as="json"
+    last-response="{{transferFunctions}}"></iron-ajax>
+
+    <iron-ajax
+    id="ajaxPost"
+    url="{{_computeHTTPUrl('/transferFunctions')}}"
+    handle-as="json"
+    content-type="application/json"
+    method="POST"></iron-ajax>
+
+    <websocket-component id="websocket" url="{{urlWS}}" auto></websocket-component>
 </template>
 
 <script>
-/** @polymerElement */
-class Rubberedge2App extends Polymer.Element {
+/**
+    * @customElement
+    * @polymer
+    * @extends Polymer.Element
+    * @appliesMixin Polymer.LazyImportsMixin
+    */
+class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
     static get is() { return 'rubberedge2-app'; }
     static get properties() {
         return {
@@ -87,6 +138,58 @@ class Rubberedge2App extends Polymer.Element {
             rootPattern: String,
             routeData: Object,
             subroute: String,
+            stepIndex: {
+                type: Number,
+                // Begin at 1 since the page first shown is instructions
+                value: 1
+            },
+            steps: {
+                type: Array,
+                value: [{
+                    "page": "instructions",
+                    "data": {}
+                },
+                {
+                    "page": "presurvey",
+                    "data": {}
+                },
+                {
+                    "page": "calibration",
+                    "data": {}
+                },
+                {
+                    "page": "wait",
+                    "data": {}
+                },
+                {
+                    "page": "fitts",
+                    "data": {}
+                },
+                {
+                    "page": "wait",
+                    "data": {}
+                },
+                {
+                    "page": "fitts",
+                    "data": {}
+                },
+                {
+                    "page": "wait",
+                    "data": {}
+                },
+                {
+                    "page": "fitts",
+                    "data": {}
+                },
+                {
+                    "page": "postsurvey",
+                    "data": {}
+                },
+                {
+                    "page": "thanks",
+                    "data": {}
+                }]
+            }
         };
     }
 
@@ -111,63 +214,79 @@ class Rubberedge2App extends Polymer.Element {
             return;
         }
         // If no page was found in the route data, page will be an empty string.
-        // Deault to 'view1' in that case.
-        this.page = page || 'view-fitts';
+        // Deault to 'instructions' in that case.
+        this.page = page || 'fitts';
     }
 
     _pageChanged(page) {
         // Load page import on demand. Show 404 page if fails
-        var resolvedPageUrl = this.resolveUrl(page + '.html');
-        Polymer.importHref(
-            resolvedPageUrl,
-            null,
-            this._showPage404.bind(this),
-            true);
-        }
+         this.importLazyGroup(page).
+         then(results => {
+             if (results.failed.length > 0 || results.loaded.length < 1) {
+                 this._showPage404();
+             }
+         });
+    }
 
-        _showPage404() {
-            this.page = 'view-404';
-        }
+    _showPage404() {
+        this.page = '404';
+    }
 
-        ready() {
-            super.ready();
-            this.$.websocket.addEventListener('websocket-message', e => this._updateMessage(e));
-            this.$.websocket.addEventListener('websocket-open', e => this._socketOpen(e));
+    ready() {
+        super.ready();
+        this.$.websocket.addEventListener('websocket-message', e => this._updateMessage(e));
+        this.$.websocket.addEventListener('websocket-open', e => this._socketOpen(e));
+        this.addEventListener('next', e => this._nextPage(e));
+    }
 
-            setTimeout(() => {
-                this._functionChanged("system");
-            }, 5000);
-        }
+    _log(log) {
+        this.$.websocket.send(JSON.stringify(log));
+    }
 
-        _log(log) {
-            this.$.websocket.send(JSON.stringify(log));
-        }
+    _ajaxResponse(event, detail) {
+        console.log(event);
+        console.log(this.transferFunctions);
+    }
 
-        _ajaxResponse(event, detail) {
-            console.log(event);
-            console.log(this.transferFunctions);
-        }
+    _functionChanged(functionName) {
+        this.$.ajaxPost.body = {"type": "transferFunction", "data": functionName};
+        this.$.ajaxPost.generateRequest();
+    }
 
-        _functionChanged(functionName) {
-            this.$.ajaxPost.body = {"type": "transferFunction", "data": functionName};
-            this.$.ajaxPost.generateRequest();
-        }
+    _computeWSUrl(port) {
+        return 'ws://' + window.location.hostname + ':' + port;
+    }
 
-        _computeWSUrl(port) {
-            return 'ws://' + window.location.hostname + ':' + port;
-        }
+    _computeHTTPUrl(path) {
+        return window.location.origin + path;
+    }
 
-        _computeHTTPUrl(path) {
-            return window.location.origin + path;
-        }
+    _updateMessage(event) {
+        this.set('mouse', JSON.parse(event.detail.data));
+    }
 
-        _updateMessage(event) {
-            this.set('mouse', JSON.parse(event.detail.data));
-        }
+    _socketOpen(event) {
+        console.log("socket open");
+    }
 
-        _socketOpen(event) {
-            console.log("socket open");
+    _nextPage(event) {
+        let step = this._step();
+        if (this.page === 'fitts') {
+            this.$.header.style.display = 'hidden';
+            this.$.footer.style.display = 'hidden';
         }
+        else {
+            this.$.header.style.display = 'block';
+            this.$.footer.style.display = 'block';
+        }
+        this.page = step.page;
+    }
+
+    _step() {
+        if (this.stepIndex <= this.steps.length) {
+            return this.steps[this.stepIndex++];
+        }
+    }
     }
     window.customElements.define(Rubberedge2App.is, Rubberedge2App);
     </script>

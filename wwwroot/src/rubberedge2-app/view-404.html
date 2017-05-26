@@ -12,14 +12,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <dom-module id="view-404">
   <template>
-    <style>
+      <style include="shared-styles">
       :host {
-        display: block;
-        padding: 10px 20px;
+          height: 100%;
+          @apply --layout-vertical;
+          @apply --layout-flex;
       }
-    </style>
 
-    Oops you hit a 404. <a href="[[rootPath]]">Head back to home.</a>
+      #content {
+          @apply --layout-flex
+          padding-left: 1rem;
+      }
+      </style>
+
+
+      <div id="content">
+          Oops you hit a 404. <a href="[[rootPath]]">Head back to home.</a>
+      </div>
+      
   </template>
 
   <script>

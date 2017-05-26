@@ -13,16 +13,16 @@ class WSSocket {
 
             ws.on('message', (data, flags) => {
                 if (messageCallback) {
-                    messageCallback(JSON.parse(data));
+                    messageCallback(JSON.parse(data), ws);
                 }
             });
         });
 
     }
 
-    send(data) {
+    send(data, ws) {
         this.wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN) {
+            if (client !== ws && client.readyState === WebSocket.OPEN) {
                 client.send(JSON.stringify(data));
             }
         })

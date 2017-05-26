@@ -1,15 +1,40 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+
+<link rel="import" href="shared-styles.html">
 
 <dom-module id="view-instructions">
     <template>
-    <style>
+    <style include="shared-styles">
     :host {
-        display: block;
-        padding: 10px 20px;
+        height: 100%;
+        @apply --layout-vertical;
+        @apply --layout-flex;
+    }
+
+    #next {
+        @apply --layout-horizontal;
+        @apply --layout-center-justified;
+        @apply --layout-end;
+        padding-bottom: 2rem;
+    }
+
+    #content {
+        @apply --layout-flex
+        padding-left: 1rem;
     }
     </style>
 
-    Oops you hit a 404. <a href="[[rootPath]]">Head back to home.</a>
+
+    <div id="content">
+        <p>
+            Lets talk about stuff
+        </p>
+    </div>
+    <div id="next">
+        <paper-button raised on-tap="_next">Next</paper-button>
+    </div>
 </template>
 
 <script>
@@ -21,6 +46,10 @@ class ViewInstructions extends Polymer.Element {
             // Polymer.Element#rootPath
             rootPath: String,
         };
+    }
+
+    _next() {
+        this.dispatchEvent(new CustomEvent('next', {bubbles: true, composed: true}));
     }
 }
 window.customElements.define(ViewInstructions.is, ViewInstructions);

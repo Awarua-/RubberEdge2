@@ -13,9 +13,9 @@ let messageHandler = (message) => {
         return;
     }
     switch(message.type) {
-        case 'transferFunction':
+        case 'touch':
         {
-            rubberEdge.changeTransferFunction(message.data);
+            rubberEdge.updatePosition(message.data);
             break;
         }
         case 'log':

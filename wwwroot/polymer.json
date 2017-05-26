@@ -3,5 +3,16 @@
     "rules": [
       "polymer-2"
     ]
-  }
+},
+"entrypoint": "index.html",
+"shell": "src/rubberedge2-app/rubberedge2-app.html",
+"sources": [
+  "src/**/*",
+  "images/**/*",
+  "bower.json"
+],
+"extraDependencies": [
+  "manifest.json",
+  "bower_components/webcomponentsjs/*.js"
+],
 }

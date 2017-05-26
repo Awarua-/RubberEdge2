@@ -4,19 +4,39 @@
 
 <dom-module id="view-fitts">
     <template>
-    <style>
+    <style include="shared-styles">
     :host {
         display: block;
+        height: 100%;
+        @apply --layout-vertical;
+        @apply --layout-flex;
         cursor: none;
     }
-    #area {
+
+    #container {
         display: block;
-        width: 100%;
+    }
+
+    #id {
         height: 100%;
     }
 
+    #target {
+
+    }
+
+    #cursor {
+        z-index: 1000;
+    }
+    circle.iso {
+    	fill: #ddd;
+    	opacity: 0.5;
+    }
+
     </style>
-    <div id="area">
+    <div id="container">
+        <div id="area">
+        </div>
     </div>
 </template>
 
@@ -34,12 +54,38 @@ class ViewFitts extends Polymer.Element {
             testDimension: Object,
             area: {
                 type: Object,
+                observer: '_setupExperiment'
+            },
+            cursorArea: {
+                type: Object,
                 observer: '_addCursor'
             },
             cursor: Object,
             log: {
                 type: Object,
                 notify: true
+            },
+            isoPositions: Array,
+        	isoParams: {
+                type: Object,
+                value: {num: 9, distance: 500, width: 75, randomize: false},
+            },
+            target: Object,
+            active: Boolean,
+            currentPosition: Number,
+            currentCount: Number,
+            miss: Number,
+            widths: {
+                type: Array,
+                value: [25, 50, 75]
+            },
+            distances: {
+                type: Array,
+                value: [500, 750, 1000]
+            },
+            combinations: {
+                type: Array,
+                value: []
             }
         };
     }
@@ -50,23 +96,50 @@ class ViewFitts extends Polymer.Element {
     }
 
     _createElements() {
-        this.testDimension = this._makeDimension(window.innerWidth,  window.innerHeight, 30, 30, 30, 30);
-        this.area = d3.select(this.$.area).append('svg');
-        this.area.attr('width', this.testDimension.width).attr('height', this.testDimension.height);
+        //FIXME Hack with the innerHeight calculation, should be based off the computed height of the container element.
+        this.testDimension = this._makeDimension(window.innerWidth,  window.innerHeight - 100, 30, 30, 30, 30);
+        this.layout = d3.select(this.$.area).append('svg');
+        this.layout
+        .attr('width', this.testDimension.width)
+        .attr('height', this.testDimension.height);
+
+        this.area = this.layout.append('g');
+        this.cursorArea = this.layout.append('g');
     }
 
-    _addCursor(newValue, oldValue) {
-        this.cursor = this.area.append("image");
+    _setupExperiment() {
+        this._generateCombinations();
+        this.currentPosition = 0;
+        this.currentCount = 0;
+        this._generateISOPositions(15, 150, 10);
+        this._updateISOCircles();
+    }
+
+    _generateCombinations() {
+        for (let w of this.widths) {
+            for (let d of this.distances) {
+                this.push('combinations', {width: w, distance: d});
+            }
+        }
+        this.combinations = this._shuffleArray(this.combinations);
+    }
+
+    _addCursor() {
+        this.cursor = this.cursorArea.append("image");
         this.cursor
         .attr("xlink:href", "../../src/images/cursor.svg")
         .attr("width", 16)
         .attr("height", 16)
+        .attr("id", "cursor")
         .attr("x", this.testDimension.width / 2)
-        .attr("y", this.testDimension.height / 2)
-        .attr("z", -1000)
+        .attr("y", this.testDimension.height / 2);
     }
 
     _updateCursorPosition() {
+        // Prevent premature movement of mouse, when cursor has not been loaded.
+        if (this.cursor === undefined) {
+            return
+        }
         let currentx = parseInt(this.cursor.attr('x'));
         let currenty = parseInt(this.cursor.attr('y'));
         currentx += this.mouse.dx;
@@ -78,6 +151,120 @@ class ViewFitts extends Polymer.Element {
         }
         this.cursor.attr('x', currentx);
         this.cursor.attr('y', currenty);
+        if (this.mouse.end) {
+            this._mouseClicked(currentx, currenty);
+        }
+    }
+
+    _mouseClicked(x, y) {
+
+        if (this._distance({x: x, y: y}, this.target) < (this.target.w / 2)) {
+            //FIXME record data like below
+            // this.addDataPoint({start: this.start,
+            //                    target: this.target,
+            //                    path: this.currentPath,
+            //                    hit: {x: x, y: y, t: (new Date).getTime()}});
+            this._removeTarget();
+            if (this.currentCount >= this.isoPositions.length) {
+                this.currentCount = 0;
+                // this.currentPosition = 0;
+                this._updateISOCircles();
+                this.active = false;
+            }
+            else {
+                this.currentCount++;
+                this._generateTarget();
+            }
+        }
+        else {
+            this.miss++;
+        }
+    }
+
+    _removeTarget() {
+        this.area.selectAll('#target').data([])
+            .exit()
+                .remove();
+    }
+
+    _generateTarget() {
+		this.target = this.isoPositions[this.currentPosition];
+		this.target.distance = this.isoParams.distance;
+		this.currentPosition = (this.currentPosition + Math.ceil(this.isoPositions.length/2)) % this.isoPositions.length;
+
+		let target = this.area.selectAll('#target').data([this.target]);
+
+		let insert = function(d) {
+			d.attr('cx', function(d) { return d.x; })
+			.attr('cy', function(d) { return d.y; })
+			.attr('r', function(d) { return d.w / 2; });
+		}
+
+		target.enter()
+			.append('circle')
+				.attr('id', 'target')
+				.style('fill', 'red')
+				.call(insert);
+
+		target.transition()
+				.call(insert);
+
+		this.active = true;
+	}
+
+    _generateISOPositions(num, d, w) {
+        this.set('isoPositions', []);
+
+        for (let i = 0; i < num; i++) {
+            this.isoPositions[i] = {x: this.testDimension.cx + ((d/2) * Math.cos((2 * Math.PI * i) / num)),
+                y: this.testDimension.cy + ((d/2) * Math.sin((2 * Math.PI * i) / num)),
+                w: w};
+        }
+    }
+
+    _updateISOCircles() {
+
+        let params = this.pop('combinations');
+        if (params === undefined) {
+            this.dispatchEvent(new CustomEvent('next', {bubbles: true, composed: true}));
+            return;
+        }
+        this.set('isoParams.width', params.width);
+        this.set('isoParams.distance', params.distance);
+
+		this._generateISOPositions(this.isoParams.num,
+			this.isoParams.distance,
+			this.isoParams.width);
+
+		let circles = this.area.selectAll('circle').data(this.isoPositions);
+
+		let insert = function(d) {
+			d.attr('cx', function(d) { return d.x; })
+			.attr('cy', function(d) { return d.y; })
+			.attr('r', function(d) { return d.w / 2; });
+		}
+
+		circles.enter()
+			.append('circle')
+				.attr('class', 'iso')
+				.call(insert);
+
+		circles.transition()
+			.call(insert);
+
+		circles.exit()
+			.transition()
+				.attr('r', 0)
+				.remove();
+
+		this._generateTarget();
+		this.active = false;
+    }
+
+    _distance(a, b) {
+    	var dx = a.x - b.x;
+    	var dy = a.y - b.y;
+    	return Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
     }
 
     /**
@@ -110,6 +297,20 @@ class ViewFitts extends Polymer.Element {
             .attr('width', dim.width)
             .attr('height', dim.height)
             .attr('class', 'back');
+        }
+
+        /**
+         * Randomize array element order in-place.
+         * Using Durstenfeld shuffle algorithm.
+         */
+        _shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                let j = Math.floor(Math.random() * (i + 1));
+                let temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+            return array;
         }
     }
 
