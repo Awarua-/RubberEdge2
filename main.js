@@ -14,26 +14,33 @@ let messageHandler = (message) => {
     }
     switch(message.type) {
         case 'touch':
-        {
             rubberEdge.updatePosition(message.data);
             break;
-        }
         case 'log':
-        {
-            console.error('log output, to implement')
+            logger.log(message.data);
             break;
-        }
+        case 'calibrate':
+            rubberEdge.calibrationInput(message.data);
+            break;
         default:
-        {
             console.error('Message was not of a supported type: ' + message.type);
-        }
     }
-};
+},
+
+    clean = () => {
+        return new Promise((resolve, reject) => {
+            server.close(() => socket.destructor().then(() => logger.destructor()).then(resolve).catch(err => reject(err)));
+        });
+    };
 
 const express = require('express'),
     app = express(),
+    Cleanup = require('./cleanup.js'),
+    cleanup = new Cleanup(clean),
     bodyParser = require('body-parser'),
     jsonParser = bodyParser.json(),
+    Logger = require('./logger.js'),
+    logger = new Logger(),
     WSSocket = require('./websocket.js'),
     socket = new WSSocket(messageHandler.bind(this)),
     RubberEdge = require('./rubberedge.js'),
@@ -53,6 +60,14 @@ app.post('/transferFunctions', jsonParser, (req, res) => {
     res.end();
 });
 
-app.listen(3000, () => {
+app.get('/participantId', (req, res) => {
+    res.json(logger.getCurrentParticipantId());
+})
+
+app.post('/participantId', (req, res) => {
+    res.json(logger.newParticipant());
+})
+
+let server = app.listen(3000, () => {
     console.log('Starting server on port 3000');
 });
