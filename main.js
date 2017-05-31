@@ -68,6 +68,10 @@ app.post('/participantId', (req, res) => {
     res.json(logger.newParticipant());
 })
 
+app.post('/presurvey', jsonParser, (req, res) => {
+    res.end();
+})
+
 let server = app.listen(3000, () => {
     console.log('Starting server on port 3000');
 });

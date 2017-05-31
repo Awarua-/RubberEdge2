@@ -96,28 +96,24 @@
     id="ajax"
     auto
     url="{{_computeHTTPUrl('/transferFunctions')}}"
-    handle-as="json"
     last-response="{{transferFunctions}}"></iron-ajax>
 
     <iron-ajax
     id="ajaxPost"
     url="{{_computeHTTPUrl('/transferFunctions')}}"
-    handle-as="json"
     content-type="application/json"
     method="POST"></iron-ajax>
 
     <iron-ajax
     auto
-    url="{{_computeWSUrl('/participantId')}}"
-    handle-as="json"
-    last-reponse={{participantId}}></iron-ajax>
+    url="{{_computeHTTPUrl('/participantId')}}"
+    last-response="{{participantId}}"></iron-ajax>
 
     <iron-ajax
     id="ajaxParticipant"
-    url="{{_computeWSUrl('/participantId')}}"
-    handle-as="json"
+    url="{{_computeHTTPUrl('/participantId')}}"
     method="POST"
-    last-reponse={{participantId}}></iron-ajax>
+    last-response="{{participantId}}"></iron-ajax>
 
 
     <websocket-component id="websocket" url="{{urlWS}}" auto></websocket-component>
@@ -152,14 +148,24 @@ class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
                 reflectToAttribute: true,
                 observer: '_pageChanged',
             },
+            reoutePrefix: String,
+            route: {
+                type: Object,
+                observer: '_route'
+            },
             log: Object,
-            rootPattern: String,
-            routeData: Object,
-            subroute: String,
+            routeData: {
+                type: Object,
+                observer: '_routeData'
+            },
             stepIndex: {
                 type: Number,
                 // Begin at 1 since the page first shown is instructions
                 value: 1
+            },
+            tail: {
+                type: Object,
+                observer: '_tail'
             },
             steps: {
                 type: Array,
@@ -225,7 +231,24 @@ class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
         this.rootPattern = (new URL(this.rootPath)).pathname;
     }
 
+    _tail(value) {
+        console.log('tail');
+        console.log(value);
+    }
+
+    _route(value) {
+        console.log('route');
+        console.log(value);
+    }
+
+    _routeData(value) {
+        console.log('route data');
+        console.log(value);
+    }
+
     _routePageChanged(page) {
+        console.log('change route');
+        console.log(page);
         // Polymer 2.0 will call with `undefined` on initialization.
         // Ignore until we are properly called with a string.
         if (page === undefined) {
@@ -233,14 +256,17 @@ class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
         }
         // If no page was found in the route data, page will be an empty string.
         // Deault to 'instructions' in that case.
-        this.page = page || 'fitts';
+        this.page = page || 'instructions';
     }
 
     _pageChanged(page) {
+        console.log(page);
+        console.log(this.page);
         // Load page import on demand. Show 404 page if fails
          this.importLazyGroup(page).
          then(results => {
              if (results.failed.length > 0 || results.loaded.length < 1) {
+                 console.log(results);
                  this._showPage404();
              }
          });
@@ -252,6 +278,8 @@ class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
 
     ready() {
         super.ready();
+        console.log("ready");
+        location = "#instuctions";
         this.$.websocket.addEventListener('websocket-message', e => this._updateMessage(e));
         this.$.websocket.addEventListener('websocket-open', e => this._socketOpen(e));
         this.addEventListener('next', e => this._nextPage(e));
@@ -295,7 +323,7 @@ class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
             this.$.header.style.display = 'block';
             this.$.footer.style.display = 'block';
         }
-        this.page = step.page;
+        this.route = step.page;
     }
 
     _reset(event) {

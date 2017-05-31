@@ -50,9 +50,15 @@ class ViewInstructions extends Polymer.Element {
         return {
             // This shouldn't be neccessary, but the Analyzer isn't picking up
             // Polymer.Element#rootPath
-            participantId: Number,
+            participantId: {
+                type:Number,
+                observer: '_part'
+            },
             rootPath: String,
         };
+    }
+    _part(val) {
+        console.log(val);
     }
 
     _next() {

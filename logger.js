@@ -46,7 +46,7 @@ class Logger {
                     return;
                 }
                 if (files.length > 0) {
-                    files = files.map(i => {return parseInt(i.strip(".txt"))});
+                    files = files.map(i => {return parseInt(i.replace(".txt", ""))});
                     files.sort((a, b) => {return a - b});
                     this.currentParticipantId = files[files.length - 1]  + 1;
                     resolve();
