@@ -29,7 +29,13 @@
 
     <div id="content">
         <p>
-            Lets talk about stuff
+            Welcome to this experiment participant: [[participantId]]
+        </p>
+        <p>
+            If the browser is not in full screen mode, put it in by pressing F11.
+        </p>
+        <p>
+            TODO talk about what your about to do.
         </p>
     </div>
     <div id="next">
@@ -44,6 +50,7 @@ class ViewInstructions extends Polymer.Element {
         return {
             // This shouldn't be neccessary, but the Analyzer isn't picking up
             // Polymer.Element#rootPath
+            participantId: Number,
             rootPath: String,
         };
     }

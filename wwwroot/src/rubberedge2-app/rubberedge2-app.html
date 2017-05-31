@@ -75,9 +75,9 @@
           attr-for-selected="name"
           fallback-selection="404"
           role="main">
-              <view-instructions name="instructions"></view-instructions>
+              <view-instructions name="instructions" participant-id="[[participantId]]"></view-instructions>
               <view-presurvey name="presurvey"></view-presurvey>
-              <view-calibration name="calibration"></view-calibration>
+              <view-calibration name="calibration" mouse="[[mouse]]" log="{{log}}"></view-calibration>
               <view-fitts name="fitts" mouse="[[mouse]]" log="{{log}}"></view-fitts>
               <view-wait name="wait"></view-wait>
               <view-postsurvey name="postsurvey"></view-postsurvey>
@@ -106,6 +106,20 @@
     content-type="application/json"
     method="POST"></iron-ajax>
 
+    <iron-ajax
+    auto
+    url="{{_computeWSUrl('/participantId')}}"
+    handle-as="json"
+    last-reponse={{participantId}}></iron-ajax>
+
+    <iron-ajax
+    id="ajaxParticipant"
+    url="{{_computeWSUrl('/participantId')}}"
+    handle-as="json"
+    method="POST"
+    last-reponse={{participantId}}></iron-ajax>
+
+
     <websocket-component id="websocket" url="{{urlWS}}" auto></websocket-component>
 </template>
 
@@ -123,6 +137,10 @@ class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
             mouse: {
                 type: Object,
                 notify: true
+            },
+            participantId: {
+                type: Number,
+                value: 0
             },
             transferFunctions: Object,
             urlWS: {
@@ -237,15 +255,13 @@ class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
         this.$.websocket.addEventListener('websocket-message', e => this._updateMessage(e));
         this.$.websocket.addEventListener('websocket-open', e => this._socketOpen(e));
         this.addEventListener('next', e => this._nextPage(e));
+        this.addEventListener('reset', e => this._reset(e));
+        this.addEventListener('newParticipant', e => this._newParticipant(e));
     }
 
     _log(log) {
+        log.participantId = this.participantId;
         this.$.websocket.send(JSON.stringify(log));
-    }
-
-    _ajaxResponse(event, detail) {
-        console.log(event);
-        console.log(this.transferFunctions);
     }
 
     _functionChanged(functionName) {
@@ -282,8 +298,22 @@ class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
         this.page = step.page;
     }
 
+    _reset(event) {
+        this.stepIndex = this.steps.length;
+        this._nextPage();
+    }
+
+    _newParticipant(event) {
+        this.$.ajaxParticipant.generateRequest();
+        this._reset();
+    }
+
     _step() {
-        if (this.stepIndex <= this.steps.length) {
+        if (this.stepIndex < this.steps.length) {
+            return this.steps[this.stepIndex++];
+        }
+        else {
+            this.stepIndex = 0;
             return this.steps[this.stepIndex++];
         }
     }

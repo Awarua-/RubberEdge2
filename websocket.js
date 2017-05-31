@@ -20,6 +20,17 @@ class WSSocket {
 
     }
 
+    destructor() {
+        return new Promise((resolve, reject) => {
+            try {
+                this.wss.close(resolve);
+            }
+            catch (err) {
+                reject(err);
+            }
+        });
+    }
+
     send(data, ws) {
         this.wss.clients.forEach((client) => {
             if (client !== ws && client.readyState === WebSocket.OPEN) {

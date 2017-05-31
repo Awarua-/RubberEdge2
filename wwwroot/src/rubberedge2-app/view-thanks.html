@@ -44,7 +44,7 @@
         };
     }
     _next() {
-      this.dispatchEvent(new CustomEvent('next', {bubbles: true, composed: true}));
+      this.dispatchEvent(new CustomEvent('newParticipant', {bubbles: true, composed: true}));
     }
     }
     window.customElements.define(ViewThanks.is, ViewThanks);
