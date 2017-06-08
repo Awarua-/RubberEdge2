@@ -19,7 +19,7 @@
     <link rel="lazy-import" group="wait" href="view-wait.html">
     <link rel="lazy-import" group="postsurvey" href="view-postsurvey.html">
     <link rel="lazy-import" group="thanks" href="view-thanks.html">
-    <link rel="lazy-import" group="404" href="view-404.html">
+    <link rel="lazy-import" group="lolcat" href="view-404.html">
     <template>
     <style include="shared-styles">
     :host {
@@ -29,13 +29,13 @@
 
     .content {
         @apply --layout-vertical;
-      @apply --layout-flex;
+        @apply --layout-flex;
     }
 
     app-header {
         padding-top: 1rem;
-        background-color: var(--app-primary-colour);
-        color: var(--text-secondary-colour);
+        background-color: var(--primary-color);
+        color: var(--secondary-text-color);
         padding-bottom: 1rem;
         padding-left: 1rem;
         text-transform: uppercase;
@@ -55,7 +55,7 @@
 
     </style>
 
-    <app-location route="{{route}}"></app-location>
+    <app-location route="{{route}}" use-hash-as-path></app-location>
     <app-route
     route="{{route}}"
     pattern="[[rootPattern]]:page"
@@ -73,16 +73,16 @@
           class="content"
           selected="[[page]]"
           attr-for-selected="name"
-          fallback-selection="404"
+          fallback-selection="lolcat"
           role="main">
               <view-instructions name="instructions" participant-id="[[participantId]]"></view-instructions>
-              <view-presurvey name="presurvey"></view-presurvey>
-              <view-calibration name="calibration" mouse="[[mouse]]" log="{{log}}"></view-calibration>
-              <view-fitts name="fitts" mouse="[[mouse]]" log="{{log}}"></view-fitts>
-              <view-wait name="wait"></view-wait>
+              <view-presurvey name="presurvey" participant-id="[[participantId]]"></view-presurvey>
+              <view-calibration name="calibration"></view-calibration>
+              <view-fitts name="fitts" mouse="[[mouse]]" log="{{log}}" page-data="{{pageData}}"></view-fitts>
+              <view-wait name="wait" page-data="{{pageData}}"></view-wait>
               <view-postsurvey name="postsurvey"></view-postsurvey>
               <view-thanks name="thanks"></view-thanks>
-              <view-404 name="404"></view-404>
+              <view-404 name="lolcat"></view-404>
           </iron-pages>
       </div>
 
@@ -97,12 +97,6 @@
     auto
     url="{{_computeHTTPUrl('/transferFunctions')}}"
     last-response="{{transferFunctions}}"></iron-ajax>
-
-    <iron-ajax
-    id="ajaxPost"
-    url="{{_computeHTTPUrl('/transferFunctions')}}"
-    content-type="application/json"
-    method="POST"></iron-ajax>
 
     <iron-ajax
     auto
@@ -148,24 +142,19 @@ class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
                 reflectToAttribute: true,
                 observer: '_pageChanged',
             },
-            reoutePrefix: String,
-            route: {
-                type: Object,
-                observer: '_route'
-            },
+            rootPattern: String,
+            route: Object,
             log: Object,
-            routeData: {
-                type: Object,
-                observer: '_routeData'
-            },
+            routeData: Object,
             stepIndex: {
                 type: Number,
                 // Begin at 1 since the page first shown is instructions
                 value: 1
             },
-            tail: {
+            tail: Object,
+            loadedPages: {
                 type: Object,
-                observer: '_tail'
+                value: {}
             },
             steps: {
                 type: Array,
@@ -183,27 +172,39 @@ class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
                 },
                 {
                     "page": "wait",
-                    "data": {}
+                    "data": {
+                        "message": "This is only a test"
+                    }
                 },
                 {
                     "page": "fitts",
-                    "data": {}
+                    "data": {
+                        "transferFunction": "rubberedge"
+                    }
                 },
                 {
                     "page": "wait",
-                    "data": {}
+                    "data": {
+                        "message": "This is only a test"
+                    }
                 },
                 {
                     "page": "fitts",
-                    "data": {}
+                    "data": {
+                        "transferFunction": "system"
+                    }
                 },
                 {
                     "page": "wait",
-                    "data": {}
+                    "data": {
+                        "message": "This is only a test"
+                    }
                 },
                 {
                     "page": "fitts",
-                    "data": {}
+                    "data": {
+                        "transferFunction": "constant"
+                    }
                 },
                 {
                     "page": "postsurvey",
@@ -231,24 +232,7 @@ class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
         this.rootPattern = (new URL(this.rootPath)).pathname;
     }
 
-    _tail(value) {
-        console.log('tail');
-        console.log(value);
-    }
-
-    _route(value) {
-        console.log('route');
-        console.log(value);
-    }
-
-    _routeData(value) {
-        console.log('route data');
-        console.log(value);
-    }
-
     _routePageChanged(page) {
-        console.log('change route');
-        console.log(page);
         // Polymer 2.0 will call with `undefined` on initialization.
         // Ignore until we are properly called with a string.
         if (page === undefined) {
@@ -260,26 +244,30 @@ class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
     }
 
     _pageChanged(page) {
-        console.log(page);
-        console.log(this.page);
         // Load page import on demand. Show 404 page if fails
+        if (this.loadedPages[page]) {
+            return;
+        }
          this.importLazyGroup(page).
          then(results => {
              if (results.failed.length > 0 || results.loaded.length < 1) {
-                 console.log(results);
                  this._showPage404();
+             }
+             else {
+                 this.loadedPages[page] = true;
              }
          });
     }
 
     _showPage404() {
-        this.page = '404';
+        this.page = 'lolcat';
     }
 
     ready() {
         super.ready();
-        console.log("ready");
-        location = "#instuctions";
+        location = "#/instructions";
+        // Load the 404 page incase of error.
+        this._pageChanged('lolcat');
         this.$.websocket.addEventListener('websocket-message', e => this._updateMessage(e));
         this.$.websocket.addEventListener('websocket-open', e => this._socketOpen(e));
         this.addEventListener('next', e => this._nextPage(e));
@@ -292,11 +280,6 @@ class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
         this.$.websocket.send(JSON.stringify(log));
     }
 
-    _functionChanged(functionName) {
-        this.$.ajaxPost.body = {"type": "transferFunction", "data": functionName};
-        this.$.ajaxPost.generateRequest();
-    }
-
     _computeWSUrl(port) {
         return 'ws://' + window.location.hostname + ':' + port;
     }
@@ -306,7 +289,10 @@ class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
     }
 
     _updateMessage(event) {
-        this.set('mouse', JSON.parse(event.detail.data));
+        let data = JSON.parse(event.detail.data);
+        if (data.type === 'mouse') {
+            this.set('mouse', data);
+        }
     }
 
     _socketOpen(event) {
@@ -323,7 +309,8 @@ class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
             this.$.header.style.display = 'block';
             this.$.footer.style.display = 'block';
         }
-        this.route = step.page;
+        this.set('routeData.page', step.page);
+        this.set('pageData', step.data);
     }
 
     _reset(event) {

@@ -1,4 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 
 <dom-module id="view-calibration">
   <template>
@@ -22,15 +24,34 @@
       }
       </style>
 
+      <iron-ajax
+      id="ajaxCalibrate"
+      url="{{_computeHTTPUrl('/calibrate')}}"
+      content-type="application/json"
+      method="POST"></iron-ajax>
+
 
       <div id="content">
           <p>
-              Lets talk about stuff
+              First we need to calibrate the interface to fit you.
           </p>
+          <p>
+              To start calibration press then start calibration button.
+          </p>
+          <p>
+              Using the phone, move your finger around the inside of the ring, without pushing on it, see the animated image for an example.
+          </p>
+
+          <p>
+              When you have completed the calibration press the next button.
+          </p>
+          <paper-button raised on-tap="_calibrate">Start Calibrating</paper-button>
       </div>
       <div id="next">
           <paper-button raised on-tap="_next">Next</paper-button>
       </div>
+
+
   </template>
 
   <script>
@@ -44,9 +65,20 @@
         };
       }
 
-    _next() {
-      this.dispatchEvent(new CustomEvent('next', {bubbles: true, composed: true}));
-    }
+        _computeHTTPUrl(path) {
+          return window.location.origin + path;
+        }
+
+        _next() {
+            this.$.ajaxCalibrate.body = {'isCalibrating': false};
+            this.$.ajaxCalibrate.generateRequest();
+            this.dispatchEvent(new CustomEvent('next', {bubbles: true, composed: true}));
+        }
+
+        _calibrate() {
+            this.$.ajaxCalibrate.body = {'isCalibrating': true};
+            this.$.ajaxCalibrate.generateRequest();
+        }
     }
     window.customElements.define(ViewCalibration.is, ViewCalibration);
   </script>

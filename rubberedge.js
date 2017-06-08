@@ -1,8 +1,9 @@
 'use-strict';
 
 const pointing = require('./pointing.node'),
-    math = require('mathjs'),
-    rubberEdgeFunctionDir = '/rubberEdgeFunction';
+    CircleFitter = require('./circleFitter.js'),
+    circleFitter = new CircleFitter(),
+    rubberEdgeFunctionDir = './rubberEdgeFunction';
 
 
 
@@ -18,15 +19,24 @@ class RubberEdge {
         // Mapping to transfer functions
         this.transferFunctions = [{"name": "system", "function": this._composeFunction("system:?slider=-2&epp=true"), "active": true},
                                      {"name": "constant", "function": this._composeFunction("constant:?cdgain=1"), "active": false},
-                                {"name": "rubberedge", "function": this._composeFunction("interp:" + rubberEdgeFunctionDir), "active": false}];
+                                {"name": "rubberedge", "function": this._composeFunction("constant:?cdgain=1"), "active": false}];
 
         this.callback = cb;
         this.input = new pointing.PointingDevice("any:?debugLevel=1");
         this.output = new pointing.DisplayDevice("any:?debugLevel=1");
         // by default set the transferFunction to the selected one
         this.tFunc = new pointing.TransferFunction(this.transferFunctions.filter(v => {if (v.name === "system") {return true}})[0].function, this.input, this.output);
+
+        //TODO fix hard coded default
+        this.selectedFunction = this.transferFunctions[0].name;
         //FIXME uncomment below to enable trackpad
         //this._setupCallback();
+        this.isCalibrating = false;
+
+        this.elasticState = false;
+        this.accelerationConstant = 0.05;
+        this.elasticUpdateFrequency = 40;
+        this.elasticVelocity = {dx: 0, dy: 0};
     }
 
     _composeFunction(uri) {
@@ -53,115 +63,157 @@ class RubberEdge {
     }
 
     updatePosition(data) {
-        let pixels = this.tFunc.applyd(data.dx, data.dy, data.timestamp),
-            isEnd = false;
+        this.last = data;
+        if (this.isCalibrating) {
+            this.calibrateInput(data);
+        }
+        else {
+            //TODO fix hard coded string
+            if (this.selectedFunction = "rubberedge") {
+
+                // conditions
+                // Enter elastic zone for the first time
+                // continue in elastic zone
+                // exit elastic zone
+                // not in the elastic zone
+                if (this._isElastic(data)) {
+                    if (this.elasticState && data.eventType != 'touchEnd') {
+                    //TODO apply momentum
+                    // Workout the difference between
+                        console.log("dx: " + data.dx);
+                        console.log("dy: " + data.dy);
+                        let vx = data.dx * this.accelerationConstant;
+                        let vy = data.dy * this.accelerationConstant;
+
+                        console.log("vx: " + vx);
+                        console.log("vy: " + vy);
+                        let vfx = this.elasticVelocity.dx + vx;
+                        let vfy = this.elasticVelocity.dy + vy;
+
+                        console.log("vfx: " + vfx);
+                        console.log("vfy: " + vfy);
+
+                        this.elasticVelocity.dx = vfx;
+                        this.elasticVelocity.dy = vfy;
+                        data.dx = vfx;
+                        data.dy = vfy;
+                    }
+                    else {
+                        // first time entering the elastic zone
+                        this.elasticState = true;
+                        this._clearElasticInterval();
+                        this.N = data;
+                        this.elasticVelocity.dx = 0.0;
+                        this.elasticVelocity.dy = 0.0;
+                    }
+                }
+                else {
+                    // previously in elastic zone, reset
+                    if (this.elasticState) {
+                        this.elasticState = false;
+                        this._clearElasticInterval();
+                        this.N = null;
+                        this.elasticVelocity.dx = 0.0;
+                        this.elasticVelocity.dy = 0.0;
+                    }
+                }
+            }
+
+            let pixels = this.tFunc.applyd(data.dx, data.dy, data.timestamp),
+                isEnd = false;
+            if (data.eventType === "touchEnd") {
+                isEnd = true;
+                // Regardless if we were in the elasticzone or not, reset the state for the isotonic zone
+                this.N = null;
+                this.elasticState = false;
+                this.elasticVelocity.dx = 0.0;
+                this.elasticVelocity.dy = 0.0;
+            }
+            if (this.callback) {
+                this.callback({type: 'mouse', dx: pixels.dx, dy: pixels.dy, timestamp: data.timestamp, end: isEnd});
+                // If this is an interval call then we should not set another inverval.
+                if (this.elasticState && !data.fake) {
+                    // When we are in the elastic state we want the pointer to continue to accelerate, even if the user remains stationary in the elastic zone.
+                    // clear the interval
+                    this._clearElasticInterval();
+                    data.fake = true;
+                    this.elasticTimeout = setInterval((data) => {this.updatePosition(data);}, this._getPeriod(), data);
+                }
+
+            }
+        }
+    }
+
+    _clearElasticInterval() {
+        if (this.elasticTimeout) {
+            clearInterval(this.elasticTimeout);
+        }
+    }
+
+    _getPeriod() {
+        if (!this.period) {
+            this.period = Math.floor(1000 / this.elasticUpdateFrequency);
+        }
+
+        return this.period;
+    }
+
+    _isElastic(data) {
+        if (!this.innerCircle || !this.innerCircle.success) {
+            console.error("Calibration needs to occur before use");
+            return;
+        }
+        let cx = data.x - this.innerCircle.center.x;
+        let cy = data.y - this.innerCircle.center.y;
+        let distance = Math.sqrt(cx * cx + cy * cy);
+
+        if (distance > this.innerCircle.r) {
+            return true;
+        }
+        return false;
+    }
+
+    calibrateInput(data) {
         if (data.eventType === "touchEnd") {
-            isEnd = true;
+            data.isEnd = true;
         }
-        if (this.callback) {
-            this.callback({dx: pixels.dx, dy: pixels.dy, timestamp: data.timestamp, end: isEnd});
-        }
+        this._calibrate(data);
     }
 
-    calibrationInput(data) {
-        switch (data.eventType) {
-            case "calibrationInner":
-                    this._calibrateInner(data);
-                break;
-
-            case "calibrationOuter":
-                this._calibrateOuter(data);
-                break;
-
-            default:
-                console.error("Calibation message not supported");
+    _calibrate(data) {
+        if (!this.caliInnerX) {
+            this.caliInnerX = [];
         }
-    }
 
-    _calibrateInner(data) {
-        this._calibrate(data, 'inner');
-    }
+        if (!this.caliInnerY) {
+            this.caliInnerY = [];
+        }
 
-    _calibrate(data, circle) {
-        switch(circle) {
-            case 'inner':
-                if (!this.caliInnerX) {
-                    this.caliInnerX = [];
-                }
+        this.caliInnerX.push(data.x);
+        this.caliInnerY.push(data.y);
 
-                if (!this.caliInnerY) {
-                    this.caliInnerY = [];
-                }
-
-                this.caliInnerX.push(data.x);
-                this.caliInnerY.push(data.y);
-                break;
-            case 'outer':
-                if (!this.caliOuterX) {
-                    this.caliOuterX = [];
-                }
-
-                if (!this.caliOuterY) {
-                    this.caliOuterY = [];
-                }
-
-                this.caliOuterX.push(data.x);
-                this.caliOuterY.push(data.y);
-                break;
-            default:
-                console.error("Circle type not supported");
-
-            if (data.isEnd) {
-                switch (circle) {
-                    case 'inner':
-                        this.caliInnerMatrix = math.matrix(this.caliInnerX, this.caliInnerY);
-
-                        this.innerPos, this.innerRadius = this._fitCircle(this.caliInnerMatrix);
-                        break;
-                    case 'outer':
-                        this.caliOuterMatrix = math.matrix(this.caliOuterX, this.caliOuterY);
-
-                        this.outerPos, this.outerRadius = this._fitCircle(this.caliOuterMatrix);
-                        break;
-                    default:
-                        console.error("Circle type not supported");
-                }
+        if (data.isEnd) {
+            if (this.caliInnerX.length !== this.caliInnerY.length) {
+                console.error('Length of arrays don\'t match up');
+                return;
             }
-        }
-    }
+            let data = [];
 
-    _calibrateoOuter(data) {
-        this._calibrate(data, 'outer');
-    }
-
-    _fitCircle(matrix) {
-        let size = math.size(matrix);
-        let transpose = math.transpose(matrix);
-        let ones = math.ones(size[1], 1);
-        let times = math.dotMultiply(matrix, matrix);
-        let summed = this._sumColumn(times);
-        let transpose2 = math.transpose(summed);
-        let concat = math.concat(transpose, ones);
-        let inverse = math.ins(concat);
-        let y = math.multiply(inverse, transpose2);
-        let yrange = math.subset(y, math.index(math.range(0, size[0])))
-        let x = math.multiply(0.5, yrange);
-        let xTransposeThing = math.multiply(math.transpose(x), x);
-        let r = math.sqrt(math.add(math.subset(y, math.index(size[0])), xTransposeThing));
-
-        return x, r;
-    }
-
-    _sumColumn(matrix) {
-        let output = []
-        for (let m = 0; m < size[1]; m++) {
-            let value = 0;
-            for (let n = 0; n < size[0]; n++) {
-                value += math.subset(matrix, math.index(n, m));
+            for (let i = 0; i < this.caliInnerX.length; i++) {
+                data.push([this.caliInnerX[i], this.caliInnerY[i]]);
             }
-            output[m] = value
+            this.innerCircle = circleFitter.calculate(data);
+            if (this.innerCircle.success) {
+                this.callback({success: this.innerCircle.success, type: 'calibrateInner', x: this.innerCircle.center.x, y: this.innerCircle.center.y, r: this.innerCircle.r});
+            }
+
+            this.caliInnerX = [];
+            this.caliInnerY = [];
         }
-        return math.matrix(output);
+    }
+
+    calibrateSwitch(data) {
+        this.isCalibrating = data.isCalibrating;
     }
 
     changeTransferFunction(data) {
@@ -170,7 +222,6 @@ class RubberEdge {
             //FIXME should throw and exception
             return;
         }
-        console.log(data);
         let functionFilter = this.transferFunctions.filter(v => {if (data === v.name) {return true}});
         if (functionFilter.length < 1 || functionFilter.length > 1) {
             console.error('found no or more than one function in the filter, not changing function');
@@ -179,6 +230,7 @@ class RubberEdge {
         }
         let newFunction = functionFilter[0].function;
         this.tFunc = new pointing.TransferFunction(newFunction, this.input, this.output);
+        this.selectedFunction = functionFilter[0].name;
         console.log('Transfer function changed');
     }
 

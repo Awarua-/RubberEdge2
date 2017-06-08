@@ -10,9 +10,19 @@
         height: 100vh;
     }
 
+    svg {
+        height: 100vh;
+        width: 100%;
+    }
+
     </style>
 
     <websocket-component id="websocket" url="{{urlWS}}" auto></websocket-component>
+    <div id="content">
+        <svg>
+            <circle id="circle" cx="0" cy="0" r="0" fill="red"></circle>
+        </svg>
+    </div>
 </template>
 
 <script>
@@ -58,10 +68,26 @@ class Rubberedge2Input extends Polymer.Element {
         super.ready();
         //this.$.websocket.addEventListener('websocket-message', e => this._updateMessage(e));
         this.$.websocket.addEventListener('websocket-open', e => this._socketOpen(e));
+        this.$.websocket.addEventListener('websocket-message', e => this._recieveMessage(e));
         this.addEventListener('touchstart', e => this._handleStart(e));
         this.addEventListener('touchend', e => this._handleEnd(e));
         this.addEventListener('touchcancel', e => this._handleCancel(e));
         this.addEventListener('touchmove', e => this._handleMove(e));
+    }
+
+    _recieveMessage(event) {
+        let data = JSON.parse(event.detail.data);
+        console.log(data);
+        if (data.type === 'calibrateInner' && data.success) {
+            this._drawCircle(data);
+        }
+    }
+
+    _drawCircle(data) {
+
+        this.$.circle.setAttribute('cx', data.y);
+        this.$.circle.setAttribute('cy', data.x);
+        this.$.circle.setAttribute('r', data.r);
     }
 
     _handleStart(event) {

@@ -22,7 +22,7 @@
 
     #content {
         @apply --layout-flex
-        padding-left: 1rem;
+        padding-left: 3rem;
     }
     </style>
 
@@ -32,10 +32,22 @@
             Welcome to this experiment participant: [[participantId]]
         </p>
         <p>
-            If the browser is not in full screen mode, put it in by pressing F11.
+            If the browser is not in full screen mode, please press F11 on the keyboard.
         </p>
         <p>
-            TODO talk about what your about to do.
+            This experiment will involve operating a pointer using a trackpad interface emulated on a phone.
+        </p>
+        <p>
+            Please make sure that you have the phone infront of you and it is secured to the table.
+        </p>
+        <p>
+            You will be tasked with moving the pointer between target circles on the screen.
+        </p>
+        <p>
+            Only use the phone with one finger.
+        </p>
+        <p>
+            When you are ready press the button at the bottom of screen.
         </p>
     </div>
     <div id="next">
@@ -50,15 +62,9 @@ class ViewInstructions extends Polymer.Element {
         return {
             // This shouldn't be neccessary, but the Analyzer isn't picking up
             // Polymer.Element#rootPath
-            participantId: {
-                type:Number,
-                observer: '_part'
-            },
+            participantId: Number,
             rootPath: String,
         };
-    }
-    _part(val) {
-        console.log(val);
     }
 
     _next() {

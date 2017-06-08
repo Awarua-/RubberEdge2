@@ -15,12 +15,10 @@ let messageHandler = (message) => {
     switch(message.type) {
         case 'touch':
             rubberEdge.updatePosition(message.data);
+            logger.log(message.data);
             break;
         case 'log':
             logger.log(message.data);
-            break;
-        case 'calibrate':
-            rubberEdge.calibrationInput(message.data);
             break;
         default:
             console.error('Message was not of a supported type: ' + message.type);
@@ -54,7 +52,8 @@ app.get('/transferFunctions', (req, res) => {
 
 app.post('/transferFunctions', jsonParser, (req, res) => {
     if (!req.body) {
-        return res.sendStatus(400);
+        res.sendStatus(400);
+        return;
     }
     rubberEdge.changeTransferFunction(req.body.data);
     res.end();
@@ -69,7 +68,30 @@ app.post('/participantId', (req, res) => {
 })
 
 app.post('/presurvey', jsonParser, (req, res) => {
+    if (!req.body) {
+        res.sendStatus(400);
+        return;
+    }
+    logger.log(req.body);
     res.end();
+})
+
+app.post('/calibrate', jsonParser, (req, res) => {
+    if (!req.body) {
+        res.sendStatus(400);
+        return;
+    }
+    rubberEdge.calibrateSwitch(req.body);
+    res.end();
+})
+
+app.use((req, res, next) => {
+    res.status(404).redirect('/#/lolcat');
+})
+
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.sendStatus(500);
 })
 
 let server = app.listen(3000, () => {

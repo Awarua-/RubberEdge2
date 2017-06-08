@@ -4,6 +4,9 @@
 <link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-divider/paper-divider.html">
+
+<link rel="import" href="shared-styles.html">
 
 <dom-module id="view-presurvey">
   <template>
@@ -12,6 +15,7 @@
           height: 100%;
           @apply --layout-vertical;
           @apply --layout-flex;
+          margin-left: 1rem;
       }
 
       #next {
@@ -25,26 +29,106 @@
           @apply --layout-flex
           padding-left: 1rem;
       }
+
+      paper-input {
+          color: var(--primary-text-color);
+          --paper-input-container-color: var(--black-color);
+      }
+
+      #genderInput {
+          padding-left: 1rem;
+          display: none;
+      }
+
+      p {
+          font-size: 18pt;
+      }
+
+      paper-divider {
+          --divider-color: var(--black-color);
+      }
+
+      #genderBlock {
+          @apply --layout-vertical;
+      }
+
+      #submit[disabled] {
+          background-color: var(--secondary-color);
+      }
+
+      p.title {
+          font-size: 22pt;
+      }
       </style>
 
 
       <div id="content">
-          <p>
-              Lets talk about stuff
+          <p class="title">
+              Please fill out this survey before beginning the experiment
           </p>
-          <form is="iron-form" id="form" method="post" content-type="application/json" action="{{_computeHTTPUrl('/presurvey')}}">
-              <paper-radio-group label="gender">
-                  <paper-radio-button name="female">Female</paper-radio-button>
-                  <paper-radio-button name="male">Male</paper-radio-button>
-                  <paper-radio-button name="non-binary">Non-Binary</paper-radio-button>
-                  <paper-radio-button name="other">Other</paper-radio-button>
-                  <paper-radio-button name="perferNot">Perfer not to say</paper-radio-button>
-              </paper-radio-group>
-          <paper-input name="name" label="name"></paper-input>
-        </form>
+          <iron-form id="form">
+              <form method="post" enctype="application/json" action="{{_computeHTTPUrl('/presurvey')}}">
+                  <p>
+                      Gender
+                  </p>
+                  <div id="genderBlock">
+                      <paper-radio-group id="radioGender" label="Gender" attr-for-selected="value" multi="false">
+                          <paper-radio-button name="gender" value="female">Female</paper-radio-button>
+                          <paper-radio-button name="gender" value="male">Male</paper-radio-button>
+                          <paper-radio-button name="gender" value="non-binary">Non-Binary</paper-radio-button>
+                          <paper-radio-button id="genderButton" name="gender" value="other">Other</paper-radio-button>
+                          <paper-radio-button name="gender" value="preferNot">Prefer not to say</paper-radio-button>
+                      </paper-radio-group>
+                      <paper-input name="gender" id="genderInput" disabled auto-focus=true label="Please Specify" no-label-float></paper-input>
+                  </div>
+                  <paper-divider margin></paper-divider>
+                  <p>
+                      Age
+                  </p>
+                  <paper-radio-group id="radioAge" label="Age" attr-for-selected="value" multi="false">
+                      <paper-radio-button name="age" value="< 15">< 15</paper-radio-button>
+                      <paper-radio-button name="age" value="15 - 25">15 - 25</paper-radio-button>
+                      <paper-radio-button name="age" value="26 - 35">26 - 35</paper-radio-button>
+                      <paper-radio-button name="age" value="36 - 45">36 - 45</paper-radio-button>
+                      <paper-radio-button name="age" value="46 - 55">46 - 55</paper-radio-button>
+                      <paper-radio-button name="age" value="56 - 65">56 - 65</paper-radio-button>
+                      <paper-radio-button name="age" value="> 65">> 65</paper-radio-button>
+                      <paper-radio-button name="age" value="preferNot">Prefer not to say</paper-radio-button>
+                  </paper-radio-group>
+                  <paper-divider relative></paper-divider>
+                  <p>
+                      How regularly do you use a trackpad as your pointer input, in hours per day spent with a computer?
+                  </p>
+                  <paper-radio-group id="radioPointer" label="Pointer" attr-for-selected="value" multi="false">
+                      <paper-radio-button name="pointer" value="0">I Never use a trackpad</paper-radio-button>
+                      <paper-radio-button name="pointer" value="< 1">< 1</paper-radio-button>
+                      <paper-radio-button name="pointer" value="1 - 2">1 - 2</paper-radio-button>
+                      <paper-radio-button name="pointer" value="2 - 4">2 - 4</paper-radio-button>
+                      <paper-radio-button name="pointer" value="4 - 6">4 - 6</paper-radio-button>
+                      <paper-radio-button name="pointer" value="6 - 8">6 - 8</paper-radio-button>
+                      <paper-radio-button name="pointer" value="> 8">> 8</paper-radio-button>
+                  </paper-radio-group>
+                  <p>
+                      When using a trackpad what is the primary operating system you use it with?
+                  </p>
+                  <paper-radio-group id="radioOs" label="OS" attr-for-selected="value" multi="false">
+                      <paper-radio-button name="os" value="osx">OSX / MacOS</paper-radio-button>
+                      <paper-radio-button name="os" value="Windows">Windows</paper-radio-button>
+                      <paper-radio-button name="os" value="linux">Linux / Unix</paper-radio-button>
+                  </paper-radio-group>
+                  <p>
+                      What is your opinion on pointer acceleration?
+                  </p>
+                  <paper-radio-group id="radioAccel" label="Pointer Acceleration" attr-for-selected="value" multi="false">
+                      <paper-radio-button name="accel" value="yes">I perfer pointer acceleration</paper-radio-button>
+                      <paper-radio-button name="accel" value="no">I dislike it, and prefer precision</paper-radio-button>
+                      <paper-radio-button name="accel" value="n/a">I don't know what it is, or have no perference</paper-radio-button>
+                  </paper-radio-group>
+            </form>
+        </iron-form>
       </div>
       <div id="next">
-          <paper-button raised on-tap="_next">Next</paper-button>
+          <paper-button id="submit" raised on-tap="_next" disabled>Next</paper-button>
       </div>
   </template>
 
@@ -56,10 +140,77 @@
           // This shouldn't be neccessary, but the Analyzer isn't picking up
           // Polymer.Element#rootPath
           rootPath: String,
+          participantId: Number,
+          genderValid: Boolean,
+          ageValid: Boolean,
+          pointerValid: Boolean,
+          osValid: Boolean,
+          accelValid: Boolean
         };
       }
+
+      ready() {
+          super.ready();
+          this.$.form.addEventListener('iron-form-presubmit', (event) => {
+              this.$.form.request.body['eventType'] = 'presurvey';
+              this.$.form.request.body['participantId'] = this.participantId;
+          });
+          this.$.radioGender.addEventListener('selected-changed', (event) => {
+              this.genderValid = true;
+              if (event.detail.value === 'other') {
+                  this.genderValid = false;
+              }
+              this.validate();
+          });
+          this.$.genderButton.addEventListener('checked-changed', (event) => {
+              if (this.$.genderButton.checked) {
+                  this.$.genderInput.style.display = 'inline-block';
+                  this.$.genderInput.disabled = false;
+              }
+              else {
+                  this.$.genderInput.style.display = 'none';
+                  this.$.genderInput.disabled = true;
+              }
+          });
+          this.$.genderInput.addEventListener('value-changed', (event) => {
+              if (this.$.genderInput.value === '') {
+                  this.genderValid = false;
+                  return;
+              }
+              this.genderValid = true;
+              this.validate();
+          });
+
+          this.$.radioAge.addEventListener('selected-changed', (event) => {
+              this.ageValid = true;
+              this.validate();
+          });
+
+          this.$.radioPointer.addEventListener('selected-changed', (event) => {
+              this.pointerValid = true;
+              this.validate();
+          });
+          this.$.radioOs.addEventListener('selected-changed', (event) => {
+              this.osValid = true;
+              this.validate();
+          });
+          this.$.radioAccel.addEventListener('selected-changed', (event) => {
+              this.accelValid = true;
+              this.validate();
+          });
+      }
+
+      validate() {
+          if (this.genderValid && this.ageValid && this.pointerValid && this.osValid && this.accelValid) {
+              this.$.submit.disabled = false;
+          }
+          else {
+              this.$.submit.disabled = true;
+          }
+      }
+
       _next() {
-          this.$.form.submit()
+          this.$.form.submit();
         this.dispatchEvent(new CustomEvent('next', {bubbles: true, composed: true}));
       }
 

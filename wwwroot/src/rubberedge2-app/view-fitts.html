@@ -1,6 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
-<!--<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">-->
-<!-- <link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html"> -->
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 
 <dom-module id="view-fitts">
     <template>
@@ -38,6 +37,12 @@
         <div id="area">
         </div>
     </div>
+
+    <iron-ajax
+    id="ajaxPost"
+    url="{{_computeHTTPUrl('/transferFunctions')}}"
+    content-type="application/json"
+    method="POST"></iron-ajax>
 </template>
 
 <script>
@@ -86,6 +91,14 @@ class ViewFitts extends Polymer.Element {
             combinations: {
                 type: Array,
                 value: []
+            },
+            pageData: {
+                type: Object,
+                observer: '_pageUpdate'
+            },
+            firstLoad: {
+                type: Boolean,
+                value: true
             }
         };
     }
@@ -113,6 +126,7 @@ class ViewFitts extends Polymer.Element {
         this.currentCount = 0;
         this._generateISOPositions(15, 150, 10);
         this._updateISOCircles();
+        this.firstLoad = false;
     }
 
     _generateCombinations() {
@@ -122,6 +136,29 @@ class ViewFitts extends Polymer.Element {
             }
         }
         this.combinations = this._shuffleArray(this.combinations);
+    }
+
+    _pageUpdate() {
+        this._setTransferFunction();
+        if (!this.firstLoad) {
+            this._generateCombinations();
+            this._updateISOCircles();
+            this._resetCursor();
+        }
+    }
+
+    _computeHTTPUrl(path) {
+        return window.location.origin + path;
+    }
+
+    _setTransferFunction() {
+        this.$.ajaxPost.body = {"type": "transferFunction", "data": this.pageData.transferFunction};
+        this.$.ajaxPost.generateRequest();
+    }
+
+    _resetCursor() {
+        this.cursor.attr("x", this.testDimension.width / 2)
+        .attr("y", this.testDimension.height / 2);
     }
 
     _addCursor() {

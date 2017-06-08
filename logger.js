@@ -100,11 +100,15 @@ class Logger {
 
     log(data) {
         //FIXME race condition, when opening new file to write too.
-        if (data.participantId !== this.currentParticipantId) {
+        if (data.participantId && data.participantId !== this.currentParticipantId) {
             console.error("participant Id does not match the file being logged to");
             //FIXME raise exception?
         }
-        this.fileStream.write(JSON.stringify(data));
+        let dataString = data;
+        if (typeof data === 'object') {
+            dataString = JSON.stringify(data);
+        }
+        this.fileStream.write(dataString + '\n');
     }
 
 }
