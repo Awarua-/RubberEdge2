@@ -1,4 +1,10 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-divider/paper-divider.html">
+<link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
 
 <dom-module id="view-postsurvey">
   <template>
@@ -13,23 +19,171 @@
           @apply --layout-horizontal;
           @apply --layout-center-justified;
           @apply --layout-end;
-          padding-bottom: 2rem;
+          padding-bottom: 5rem;
+          margin-top: 4rem;
       }
 
       #content {
-          @apply --layout-flex
-          padding-left: 1rem;
+          @apply --layout-flex;
+          padding-left: 2rem;
+      }
+
+      p {
+          font-size: 18pt;
+      }
+
+      .likert {
+          @apply --layout-horizontal;
+      }
+
+      paper-divider {
+          --paper-divider-color: black;
+          height: 100%;
+      }
+
+      p.title {
+          font-size: 22pt;
+      }
+
+      .functionType {
+          font-size: 20pt;
+      }
+
+      .question {
+          font-size: 16pt;
+      }
+
+      paper-textarea {
+          color: var(--primary-text-color);
+          --paper-input-container-color: var(--black-color);
+          font-size: 20pt;
       }
       </style>
 
 
       <div id="content">
-          <p>
-              Lets talk about stuff
+          <p class="title">
+              Please fill out this post experiment survey
           </p>
+          <iron-form id="form">
+              <form method="post" enctype="application/json" action="{{_computeHTTPUrl('/postsurvey')}}">
+                    <div>
+                        <p class="functionType">
+                          Constant Linear Function
+                        </p>
+                        <p class="question">
+                            The interface was frustrating to use?
+                        </p>
+                        <paper-radio-group class="likert" label="Frustration" attr-for-selected="value" multi="false">
+                            <paper-radio-button name="constant frustration" value="Strongly Agree">Strongly Agree</paper-radio-button>
+                            <paper-radio-button name="constant frustration" value="Agree">Agree</paper-radio-button>
+                            <paper-radio-button name="constant frustration" value="Netural" checked>Netural</paper-radio-button>
+                            <paper-radio-button name="constant frustration" value="Disagree">Disagree</paper-radio-button>
+                            <paper-radio-button name="constant frustration" value="Strongly Disagree">Strongly Disagree</paper-radio-button>
+                        </paper-radio-group>
+                        <p class="question">
+                            The interface was easy to use?
+                        </p>
+                        <paper-radio-group class="likert" label="Ease of Use" attr-for-selected="value" multi="false">
+                            <paper-radio-button name="constant ease of use" value="Strongly Agree">Strongly Agree</paper-radio-button>
+                            <paper-radio-button name="constant ease of use" value="Agree">Agree</paper-radio-button>
+                            <paper-radio-button name="constant ease of use" value="Netural" checked>Netural</paper-radio-button>
+                            <paper-radio-button name="constant ease of use" value="Disagree">Disagree</paper-radio-button>
+                            <paper-radio-button name="constant ease of use" value="Strongly Disagree">Strongly Disagree</paper-radio-button>
+                        </paper-radio-group>
+                        <p class="question">
+                            The interface felt accurate?
+                        </p>
+                        <paper-radio-group class="likert" label="Accuracy" attr-for-selected="value" multi="false">
+                            <paper-radio-button name="constant accuracy" value="Strongly Agree">Strongly Agree</paper-radio-button>
+                            <paper-radio-button name="constant accuracy" value="Agree">Agree</paper-radio-button>
+                            <paper-radio-button name="constant accuracy" value="Netural" checked>Netural</paper-radio-button>
+                            <paper-radio-button name="constant accuracy" value="Disagree">Disagree</paper-radio-button>
+                            <paper-radio-button name="constant accuracy" value="Strongly Disagree">Strongly Disagree</paper-radio-button>
+                        </paper-radio-group>
+                        <paper-textarea label="Other feedback or comments with regard to the Constant function"></paper-textarea>
+                    </div>
+                    <paper-divider margin></paper-divider>
+                    <div>
+                        <p class="functionType">
+                          Acceleration Function
+                        </p>
+                        <p class="question">
+                            The interface was frustrating to use?
+                        </p>
+                        <paper-radio-group class="likert" label="Frustration" attr-for-selected="value" multi="false">
+                            <paper-radio-button name="acceleration frustration" value="Strongly Agree">Strongly Agree</paper-radio-button>
+                            <paper-radio-button name="acceleration frustration" value="Agree">Agree</paper-radio-button>
+                            <paper-radio-button name="acceleration frustration" value="Netural" checked>Netural</paper-radio-button>
+                            <paper-radio-button name="acceleration frustration" value="Disagree">Disagree</paper-radio-button>
+                            <paper-radio-button name="acceleration frustration" value="Strongly Disagree">Strongly Disagree</paper-radio-button>
+                        </paper-radio-group>
+                        <p class="question">
+                            The interface was easy to use?
+                        </p>
+                        <paper-radio-group class="likert" label="Ease of Use" attr-for-selected="value" multi="false">
+                            <paper-radio-button name="acceleration ease of use" value="Strongly Agree">Strongly Agree</paper-radio-button>
+                            <paper-radio-button name="acceleration ease of use" value="Agree">Agree</paper-radio-button>
+                            <paper-radio-button name="acceleration ease of use" value="Netural" checked>Netural</paper-radio-button>
+                            <paper-radio-button name="acceleration ease of use" value="Disagree">Disagree</paper-radio-button>
+                            <paper-radio-button name="acceleration ease of use" value="Strongly Disagree">Strongly Disagree</paper-radio-button>
+                        </paper-radio-group>
+                        <p class="question">
+                            The interface felt accurate?
+                        </p>
+                        <paper-radio-group class="likert" label="Accuracy" attr-for-selected="value" multi="false">
+                            <paper-radio-button name="acceleration accuracy" value="Strongly Agree">Strongly Agree</paper-radio-button>
+                            <paper-radio-button name="acceleration accuracy" value="Agree">Agree</paper-radio-button>
+                            <paper-radio-button name="acceleration accuracy" value="Netural" checked>Netural</paper-radio-button>
+                            <paper-radio-button name="acceleration accuracy" value="Disagree">Disagree</paper-radio-button>
+                            <paper-radio-button name="acceleration accuracy" value="Strongly Disagree">Strongly Disagree</paper-radio-button>
+                        </paper-radio-group>
+                        <paper-textarea label="Other feedback or comments with regard to the Acceleration function"></paper-textarea>
+                    </div>
+                    <paper-divider margin></paper-divider>
+                    <div>
+                        <p class="functionType">
+                          RubberEdge Function
+                        </p>
+                        <p class="question">
+                            The interface was frustrating to use?
+                        </p>
+                        <paper-radio-group class="likert" label="Frustration" attr-for-selected="value" multi="false">
+                            <paper-radio-button name="rubberedge frustration" value="Strongly Agree">Strongly Agree</paper-radio-button>
+                            <paper-radio-button name="rubberedge frustration" value="Agree">Agree</paper-radio-button>
+                            <paper-radio-button name="rubberedge frustration" value="Netural" checked>Netural</paper-radio-button>
+                            <paper-radio-button name="rubberedge frustration" value="Disagree">Disagree</paper-radio-button>
+                            <paper-radio-button name="rubberedge frustration" value="Strongly Disagree">Strongly Disagree</paper-radio-button>
+                        </paper-radio-group>
+                        <p class="question">
+                            The interface was easy to use?
+                        </p>
+                        <paper-radio-group class="likert" label="Ease of Use" attr-for-selected="value" multi="false">
+                            <paper-radio-button name="rubberedge ease of use" value="Strongly Agree">Strongly Agree</paper-radio-button>
+                            <paper-radio-button name="rubberedge ease of use" value="Agree">Agree</paper-radio-button>
+                            <paper-radio-button name="rubberedge ease of use" value="Netural" checked>Netural</paper-radio-button>
+                            <paper-radio-button name="rubberedge ease of use" value="Disagree">Disagree</paper-radio-button>
+                            <paper-radio-button name="rubberedge ease of use" value="Strongly Disagree">Strongly Disagree</paper-radio-button>
+                        </paper-radio-group>
+                        <p class="question">
+                            The interface felt accurate?
+                        </p>
+                        <paper-radio-group class="likert" label="Accuracy" attr-for-selected="value" multi="false">
+                            <paper-radio-button name="rubberedge accuracy" value="Strongly Agree">Strongly Agree</paper-radio-button>
+                            <paper-radio-button name="rubberedge accuracy" value="Agree">Agree</paper-radio-button>
+                            <paper-radio-button name="rubberedge accuracy" value="Netural" checked>Netural</paper-radio-button>
+                            <paper-radio-button name="rubberedge accuracy" value="Disagree">Disagree</paper-radio-button>
+                            <paper-radio-button name="rubberedge accuracy" value="Strongly Disagree">Strongly Disagree</paper-radio-button>
+                        </paper-radio-group>
+                        <paper-textarea label="Other feedback or comments with regard to the RubberEdge function"></paper-textarea>
+                    </div>
+                    <paper-divider margin></paper-divider>
+                    <paper-textarea label="Additional feedback or questions"></paper-textarea>
+            </form>
+        </iron-form>
       </div>
       <div id="next">
-          <paper-button raised on-tap="_next">Next</paper-button>
+          <paper-button id="submit" raised on-tap="_next">Next</paper-button>
       </div>
   </template>
 
@@ -40,12 +194,27 @@
         return {
           // This shouldn't be neccessary, but the Analyzer isn't picking up
           // Polymer.Element#rootPath
-          rootPath: String,
+          rootPath: String
         };
       }
 
+      ready() {
+          super.ready();
+          this.$.form.addEventListener('iron-form-presubmit', (event) => {
+              console.log("yay");
+              this.$.form.request.body['eventType'] = 'postsurvey';
+              this.$.form.request.body['participantId'] = this.participantId;
+          });
+      }
+
       _next() {
+        this.$.form.submit();
+        console.log("test");
         this.dispatchEvent(new CustomEvent('next', {bubbles: true, composed: true}));
+      }
+
+      _computeHTTPUrl(path) {
+          return window.location.origin + path;
       }
     }
     window.customElements.define(ViewPostsurvey.is, ViewPostsurvey);

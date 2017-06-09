@@ -34,9 +34,10 @@ class RubberEdge {
         this.isCalibrating = false;
 
         this.elasticState = false;
-        this.accelerationConstant = 0.05;
+        this.accelerationConstant = 0.1;
         this.elasticUpdateFrequency = 40;
         this.elasticVelocity = {dx: 0, dy: 0};
+        this.movementHistory = [];
     }
 
     _composeFunction(uri) {
@@ -68,6 +69,8 @@ class RubberEdge {
             this.calibrateInput(data);
         }
         else {
+            this.movementHistory.push(data);
+
             //TODO fix hard coded string
             if (this.selectedFunction = "rubberedge") {
 
@@ -87,14 +90,15 @@ class RubberEdge {
 
                         console.log("vx: " + vx);
                         console.log("vy: " + vy);
-                        let vfx = this.elasticVelocity.dx + vx;
-                        let vfy = this.elasticVelocity.dy + vy;
+
+                        let vfx = this.elasticVelocity.vx + vx;
+                        let vfy = this.elasticVelocity.vy + vy;
 
                         console.log("vfx: " + vfx);
                         console.log("vfy: " + vfy);
 
-                        this.elasticVelocity.dx = vfx;
-                        this.elasticVelocity.dy = vfy;
+                        this.elasticVelocity.vx = vfx;
+                        this.elasticVelocity.vy = vfy;
                         data.dx = vfx;
                         data.dy = vfy;
                     }
@@ -102,9 +106,8 @@ class RubberEdge {
                         // first time entering the elastic zone
                         this.elasticState = true;
                         this._clearElasticInterval();
-                        this.N = data;
-                        this.elasticVelocity.dx = 0.0;
-                        this.elasticVelocity.dy = 0.0;
+                        this._findInitialVelocity();
+
                     }
                 }
                 else {
@@ -112,9 +115,8 @@ class RubberEdge {
                     if (this.elasticState) {
                         this.elasticState = false;
                         this._clearElasticInterval();
-                        this.N = null;
-                        this.elasticVelocity.dx = 0.0;
-                        this.elasticVelocity.dy = 0.0;
+                        this.elasticVelocity.vx = 0.0;
+                        this.elasticVelocity.vy = 0.0;
                     }
                 }
             }
@@ -124,10 +126,10 @@ class RubberEdge {
             if (data.eventType === "touchEnd") {
                 isEnd = true;
                 // Regardless if we were in the elasticzone or not, reset the state for the isotonic zone
-                this.N = null;
                 this.elasticState = false;
-                this.elasticVelocity.dx = 0.0;
-                this.elasticVelocity.dy = 0.0;
+                this.elasticVelocity.vx = 0.0;
+                this.elasticVelocity.vy = 0.0;
+                this.movementHistory = [];
             }
             if (this.callback) {
                 this.callback({type: 'mouse', dx: pixels.dx, dy: pixels.dy, timestamp: data.timestamp, end: isEnd});
@@ -142,6 +144,27 @@ class RubberEdge {
 
             }
         }
+    }
+
+    _findInitialVelocity() {
+        this.elasticVelocity.vx = 0.0;
+        this.elasticVelocity.vy = 0.0;
+        if (this.movementHistory.length <= 1) {
+            return;
+        }
+        let numToConsider = Math.min(3, this.movementHistory.length),
+            dx = 0,
+            dy = 0,
+            startingIndex = this.movementHistory.length - numToConsider,
+            endIndex = this.movementHistory.length - 1;
+        // Look at the last two or three data points
+        for (let i = startingIndex; i <= endIndex; i++) {
+            dx += this.movementHistory[i].dx;
+            dy += this.movementHistory[i].dy;
+        }
+
+        this.elasticVelocity.vx = dx / numToConsider;
+        this.elasticVelocity.vy = dy / numToConsider;
     }
 
     _clearElasticInterval() {

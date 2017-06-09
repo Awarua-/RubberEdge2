@@ -32,6 +32,10 @@
         @apply --layout-flex;
     }
 
+    .layout {
+        @apply --layout-vertical;
+    }
+
     app-header {
         padding-top: 1rem;
         background-color: var(--primary-color);
@@ -44,6 +48,10 @@
     }
 
     footer {
+        margin: 0 auto;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
       height: 50px;
       line-height: 50px;
       text-align: center;
@@ -61,6 +69,8 @@
     pattern="[[rootPattern]]:page"
     data="{{routeData}}"
     tail="{{subroute}}"></app-route>
+
+    <div class="layout">
 
     <app-header-layout fullbleed>
 
@@ -92,6 +102,8 @@
 
     </app-header-layout>
 
+
+    </div>
     <iron-ajax
     id="ajax"
     auto
@@ -173,37 +185,88 @@ class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
                 {
                     "page": "wait",
                     "data": {
-                        "message": "This is only a test"
+                        "message": "First lets do some training using the Constant function."
                     }
                 },
                 {
                     "page": "fitts",
                     "data": {
-                        "transferFunction": "rubberedge"
+                        "transferFunction": "constant",
+                        "widths": [50],
+                        "distances": [750]
                     }
                 },
                 {
                     "page": "wait",
                     "data": {
-                        "message": "This is only a test"
+                        "message": "Training with Acceleration Function"
                     }
                 },
                 {
                     "page": "fitts",
                     "data": {
-                        "transferFunction": "system"
+                        "transferFunction": "system",
+                        "widths": [50],
+                        "distances": [750]
                     }
                 },
                 {
                     "page": "wait",
                     "data": {
-                        "message": "This is only a test"
+                        "message": "Training with the new function, RubberEdge."
                     }
                 },
                 {
                     "page": "fitts",
                     "data": {
-                        "transferFunction": "constant"
+                        "transferFunction": "rubberedge",
+                        "widths": [50],
+                        "distances": [750]
+                    }
+                },
+                {
+                    "page": "wait",
+                    "data": {
+                        "message": "Ok, this time its for real, starting with the RubberEdge function."
+                    }
+                },
+                {
+                    "page": "fitts",
+                    "data": {
+                        "transferFunction": "rubberedge",
+                        "widths": [25, 50, 75],
+                        "distances": [500, 750, 1000]
+                    }
+                    }
+                },
+                {
+                    "page": "wait",
+                    "data": {
+                        "message": "Acceleration function."
+                    }
+                },
+                {
+                    "page": "fitts",
+                    "data": {
+                        "transferFunction": "system",
+                        "widths": [25, 50, 75],
+                        "distances": [500, 750, 1000]
+                    }
+                    }
+                },
+                {
+                    "page": "wait",
+                    "data": {
+                        "message": "You're almost there, last one, Constant function."
+                    }
+                },
+                {
+                    "page": "fitts",
+                    "data": {
+                        "transferFunction": "constant",
+                        "widths": [25, 50, 75],
+                        "distances": [500, 750, 1000]
+                    }
                     }
                 },
                 {

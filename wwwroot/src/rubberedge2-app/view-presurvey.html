@@ -22,11 +22,11 @@
           @apply --layout-horizontal;
           @apply --layout-center-justified;
           @apply --layout-end;
-          padding-bottom: 2rem;
+          padding-bottom: 4rem;
       }
 
       #content {
-          @apply --layout-flex
+          @apply --layout-flex;
           padding-left: 1rem;
       }
 
@@ -211,7 +211,7 @@
 
       _next() {
           this.$.form.submit();
-        this.dispatchEvent(new CustomEvent('next', {bubbles: true, composed: true}));
+          this.dispatchEvent(new CustomEvent('next', {bubbles: true, composed: true}));
       }
 
       _computeHTTPUrl(path) {

@@ -18,8 +18,7 @@
     "paper-radio-group": "PolymerElements/paper-radio-group#^2.0.0",
     "paper-radio-button": "PolymerElements/paper-radio-button#^2.0.0",
     "paper-input": "PolymerElements/paper-input#^2.0.0",
-    "paper-divider": "wincinderith/paper-divider#^2.0.0",
-    "paper-slider": "PolymerElements/paper-slider#^2.0.0"
+    "paper-divider": "wincinderith/paper-divider#^2.0.0"
   },
   "devDependencies": {
     "web-component-tester": "^6.0.0-prerelease.5",

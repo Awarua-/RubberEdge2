@@ -14,12 +14,26 @@
       @apply --layout-horizontal;
       @apply --layout-center-justified;
   }
+
+  iron-timer {
+      font-size: 20pt;
+      color: var(--primary-text-color);
+  }
+
+  .message {
+      font-size: 24pt;
+      padding-top: 3rem;
+      padding-left: 2rem;
+  }
   </style>
 
 
   <div id="content">
       <iron-timer id="timer" start-time="5" current-time="{{currentTime}}" on-iron-timer-end="_next">[[currentTime]]</iron-timer>
   </div>
+  <p class="message">
+      {{pageData.Message}}
+  </p>
   </template>
 
   <script>
@@ -31,7 +45,10 @@
           // Polymer.Element#rootPath
           rootPath: String,
           currentTime: Number,
-
+          pageData: {
+              type: Object,
+              observer: '_pageUpdate'
+          },
         };
       }
       ready() {
@@ -40,6 +57,12 @@
       }
       _next() {
         this.dispatchEvent(new CustomEvent('next', {bubbles: true, composed: true}));
+      }
+      _pageUpdate() {
+          this.$.timer.reset();
+          let time = this.pageData.time || 5;
+          this.$.timer.startTime = time;
+          this.$.timer.start();
       }
     }
     window.customElements.define(ViewWait.is, ViewWait);

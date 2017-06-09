@@ -76,6 +76,15 @@ app.post('/presurvey', jsonParser, (req, res) => {
     res.end();
 })
 
+app.post('/postsurvey', jsonParser, (req, res) => {
+    if (!req.body) {
+        res.sendStatus(400);
+        return;
+    }
+    logger.log(req.body);
+    res.end();
+})
+
 app.post('/calibrate', jsonParser, (req, res) => {
     if (!req.body) {
         res.sendStatus(400);
