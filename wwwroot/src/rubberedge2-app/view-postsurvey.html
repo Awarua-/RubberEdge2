@@ -41,6 +41,11 @@
           height: 100%;
       }
 
+      #submit[disabled] {
+          background-color: var(--secondary-color);
+      }
+
+
       p.title {
           font-size: 22pt;
       }
@@ -74,30 +79,30 @@
                         <p class="question">
                             The interface was frustrating to use?
                         </p>
-                        <paper-radio-group class="likert" label="Frustration" attr-for-selected="value" multi="false">
+                        <paper-radio-group id="radioConstantFrustration" class="likert" label="Frustration" attr-for-selected="value" multi="false">
                             <paper-radio-button name="constant frustration" value="Strongly Agree">Strongly Agree</paper-radio-button>
                             <paper-radio-button name="constant frustration" value="Agree">Agree</paper-radio-button>
-                            <paper-radio-button name="constant frustration" value="Netural" checked>Netural</paper-radio-button>
+                            <paper-radio-button name="constant frustration" value="Netural">Netural</paper-radio-button>
                             <paper-radio-button name="constant frustration" value="Disagree">Disagree</paper-radio-button>
                             <paper-radio-button name="constant frustration" value="Strongly Disagree">Strongly Disagree</paper-radio-button>
                         </paper-radio-group>
                         <p class="question">
                             The interface was easy to use?
                         </p>
-                        <paper-radio-group class="likert" label="Ease of Use" attr-for-selected="value" multi="false">
+                        <paper-radio-group id="radioConstantEaseOfUse" class="likert" label="Ease of Use" attr-for-selected="value" multi="false">
                             <paper-radio-button name="constant ease of use" value="Strongly Agree">Strongly Agree</paper-radio-button>
                             <paper-radio-button name="constant ease of use" value="Agree">Agree</paper-radio-button>
-                            <paper-radio-button name="constant ease of use" value="Netural" checked>Netural</paper-radio-button>
+                            <paper-radio-button name="constant ease of use" value="Netural">Netural</paper-radio-button>
                             <paper-radio-button name="constant ease of use" value="Disagree">Disagree</paper-radio-button>
                             <paper-radio-button name="constant ease of use" value="Strongly Disagree">Strongly Disagree</paper-radio-button>
                         </paper-radio-group>
                         <p class="question">
                             The interface felt accurate?
                         </p>
-                        <paper-radio-group class="likert" label="Accuracy" attr-for-selected="value" multi="false">
+                        <paper-radio-group id="radioConstantAccuracy" class="likert" label="Accuracy" attr-for-selected="value" multi="false">
                             <paper-radio-button name="constant accuracy" value="Strongly Agree">Strongly Agree</paper-radio-button>
                             <paper-radio-button name="constant accuracy" value="Agree">Agree</paper-radio-button>
-                            <paper-radio-button name="constant accuracy" value="Netural" checked>Netural</paper-radio-button>
+                            <paper-radio-button name="constant accuracy" value="Netural">Netural</paper-radio-button>
                             <paper-radio-button name="constant accuracy" value="Disagree">Disagree</paper-radio-button>
                             <paper-radio-button name="constant accuracy" value="Strongly Disagree">Strongly Disagree</paper-radio-button>
                         </paper-radio-group>
@@ -111,30 +116,30 @@
                         <p class="question">
                             The interface was frustrating to use?
                         </p>
-                        <paper-radio-group class="likert" label="Frustration" attr-for-selected="value" multi="false">
+                        <paper-radio-group id="radioAccelerationFrustration" class="likert" label="Frustration" attr-for-selected="value" multi="false">
                             <paper-radio-button name="acceleration frustration" value="Strongly Agree">Strongly Agree</paper-radio-button>
                             <paper-radio-button name="acceleration frustration" value="Agree">Agree</paper-radio-button>
-                            <paper-radio-button name="acceleration frustration" value="Netural" checked>Netural</paper-radio-button>
+                            <paper-radio-button name="acceleration frustration" value="Netural">Netural</paper-radio-button>
                             <paper-radio-button name="acceleration frustration" value="Disagree">Disagree</paper-radio-button>
                             <paper-radio-button name="acceleration frustration" value="Strongly Disagree">Strongly Disagree</paper-radio-button>
                         </paper-radio-group>
                         <p class="question">
                             The interface was easy to use?
                         </p>
-                        <paper-radio-group class="likert" label="Ease of Use" attr-for-selected="value" multi="false">
+                        <paper-radio-group id="radioAccelerationEaseOfUse" class="likert" label="Ease of Use" attr-for-selected="value" multi="false">
                             <paper-radio-button name="acceleration ease of use" value="Strongly Agree">Strongly Agree</paper-radio-button>
                             <paper-radio-button name="acceleration ease of use" value="Agree">Agree</paper-radio-button>
-                            <paper-radio-button name="acceleration ease of use" value="Netural" checked>Netural</paper-radio-button>
+                            <paper-radio-button name="acceleration ease of use" value="Netural">Netural</paper-radio-button>
                             <paper-radio-button name="acceleration ease of use" value="Disagree">Disagree</paper-radio-button>
                             <paper-radio-button name="acceleration ease of use" value="Strongly Disagree">Strongly Disagree</paper-radio-button>
                         </paper-radio-group>
                         <p class="question">
                             The interface felt accurate?
                         </p>
-                        <paper-radio-group class="likert" label="Accuracy" attr-for-selected="value" multi="false">
+                        <paper-radio-group id="radioAccelerationAccuracy" class="likert" label="Accuracy" attr-for-selected="value" multi="false">
                             <paper-radio-button name="acceleration accuracy" value="Strongly Agree">Strongly Agree</paper-radio-button>
                             <paper-radio-button name="acceleration accuracy" value="Agree">Agree</paper-radio-button>
-                            <paper-radio-button name="acceleration accuracy" value="Netural" checked>Netural</paper-radio-button>
+                            <paper-radio-button name="acceleration accuracy" value="Netural">Netural</paper-radio-button>
                             <paper-radio-button name="acceleration accuracy" value="Disagree">Disagree</paper-radio-button>
                             <paper-radio-button name="acceleration accuracy" value="Strongly Disagree">Strongly Disagree</paper-radio-button>
                         </paper-radio-group>
@@ -148,30 +153,30 @@
                         <p class="question">
                             The interface was frustrating to use?
                         </p>
-                        <paper-radio-group class="likert" label="Frustration" attr-for-selected="value" multi="false">
+                        <paper-radio-group id="radioRubberedgeFrustration" class="likert" label="Frustration" attr-for-selected="value" multi="false">
                             <paper-radio-button name="rubberedge frustration" value="Strongly Agree">Strongly Agree</paper-radio-button>
                             <paper-radio-button name="rubberedge frustration" value="Agree">Agree</paper-radio-button>
-                            <paper-radio-button name="rubberedge frustration" value="Netural" checked>Netural</paper-radio-button>
+                            <paper-radio-button name="rubberedge frustration" value="Netural">Netural</paper-radio-button>
                             <paper-radio-button name="rubberedge frustration" value="Disagree">Disagree</paper-radio-button>
                             <paper-radio-button name="rubberedge frustration" value="Strongly Disagree">Strongly Disagree</paper-radio-button>
                         </paper-radio-group>
                         <p class="question">
                             The interface was easy to use?
                         </p>
-                        <paper-radio-group class="likert" label="Ease of Use" attr-for-selected="value" multi="false">
+                        <paper-radio-group id="radioRubberedgeEaseOfUse" class="likert" label="Ease of Use" attr-for-selected="value" multi="false">
                             <paper-radio-button name="rubberedge ease of use" value="Strongly Agree">Strongly Agree</paper-radio-button>
                             <paper-radio-button name="rubberedge ease of use" value="Agree">Agree</paper-radio-button>
-                            <paper-radio-button name="rubberedge ease of use" value="Netural" checked>Netural</paper-radio-button>
+                            <paper-radio-button name="rubberedge ease of use" value="Netural">Netural</paper-radio-button>
                             <paper-radio-button name="rubberedge ease of use" value="Disagree">Disagree</paper-radio-button>
                             <paper-radio-button name="rubberedge ease of use" value="Strongly Disagree">Strongly Disagree</paper-radio-button>
                         </paper-radio-group>
                         <p class="question">
                             The interface felt accurate?
                         </p>
-                        <paper-radio-group class="likert" label="Accuracy" attr-for-selected="value" multi="false">
+                        <paper-radio-group id="radioRubberedgeAccuracy" class="likert" label="Accuracy" attr-for-selected="value" multi="false">
                             <paper-radio-button name="rubberedge accuracy" value="Strongly Agree">Strongly Agree</paper-radio-button>
                             <paper-radio-button name="rubberedge accuracy" value="Agree">Agree</paper-radio-button>
-                            <paper-radio-button name="rubberedge accuracy" value="Netural" checked>Netural</paper-radio-button>
+                            <paper-radio-button name="rubberedge accuracy" value="Netural">Netural</paper-radio-button>
                             <paper-radio-button name="rubberedge accuracy" value="Disagree">Disagree</paper-radio-button>
                             <paper-radio-button name="rubberedge accuracy" value="Strongly Disagree">Strongly Disagree</paper-radio-button>
                         </paper-radio-group>
@@ -181,17 +186,17 @@
                     <p class="question">
                         What was your preferred pointer function?
                     </p>
-                    <paper-radio-group class="preference" label="Preference" attr-for-selected="value" multi="false">
+                    <paper-radio-group id="radioPreference" class="preference" label="Preference" attr-for-selected="value" multi="false">
                         <paper-radio-button name="preference" value="Constant">Constant Function</paper-radio-button>
                         <paper-radio-button name="preference" value="Acceleration">Acceleration Function</paper-radio-button>
-                        <paper-radio-button name="preference" value="RubberEdge" checked>RubberEdge Function</paper-radio-button>
+                        <paper-radio-button name="preference" value="RubberEdge">RubberEdge Function</paper-radio-button>
                     </paper-radio-group>
                     <paper-textarea label="Additional feedback or questions"></paper-textarea>
             </form>
         </iron-form>
       </div>
       <div id="next">
-          <paper-button id="submit" raised on-tap="_next">Next</paper-button>
+          <paper-button id="submit" raised on-tap="_next" disabled>Next</paper-button>
       </div>
   </template>
 
@@ -202,7 +207,17 @@
         return {
           // This shouldn't be neccessary, but the Analyzer isn't picking up
           // Polymer.Element#rootPath
-          rootPath: String
+          rootPath: String,
+          constantFrustration: Boolean,
+          constantEaseOfUse: Boolean,
+          constantAccuracy: Boolean,
+          accelerationFrustration: Boolean,
+          accelerationEaseOfUse: Boolean,
+          accelerationAccuracy: Boolean,
+          rubberedgeFrustration: Boolean,
+          rubberedgeEaseOfUse: Boolean,
+          rubberedgeAccuracy: Boolean,
+          preference: Boolean
         };
       }
 
@@ -212,6 +227,57 @@
               this.$.form.request.body['eventType'] = 'postsurvey';
               this.$.form.request.body['participantId'] = this.participantId;
           });
+
+          this.$.radioConstantFrustration.addEventListener('selected-changed', (event) => {
+              this.constantFrustration = true;
+              this.validate();
+          });
+
+          this.$.radioConstantEaseOfUse.addEventListener('selected-changed', (event) => {
+              this.constantEaseOfUse = true;
+              this.validate();
+          });
+          this.$.radioConstantAccuracy.addEventListener('selected-changed', (event) => {
+              this.constantAccuracy = true;
+              this.validate();
+          });
+          this.$.radioAccelerationFrustration.addEventListener('selected-changed', (event) => {
+              this.accelerationFrustration = true;
+              this.validate();
+          });
+          this.$.radioAccelerationEaseOfUse.addEventListener('selected-changed', (event) => {
+              this.accelerationEaseOfUse = true;
+              this.validate();
+          });
+          this.$.radioAccelerationAccuracy.addEventListener('selected-changed', (event) => {
+              this.accelerationAccuracy = true;
+              this.validate();
+          });
+          this.$.radioRubberedgeFrustration.addEventListener('selected-changed', (event) => {
+              this.rubberedgeFrustration = true;
+              this.validate();
+          });
+          this.$.radioRubberedgeEaseOfUse.addEventListener('selected-changed', (event) => {
+              this.rubberedgeEaseOfUse = true;
+              this.validate();
+          });
+          this.$.radioRubberedgeAccuracy.addEventListener('selected-changed', (event) => {
+              this.rubberedgeAccuracy = true;
+              this.validate();
+          });
+          this.$.radioPreference.addEventListener('selected-changed', (event) => {
+              this.preference = true;
+              this.validate();
+          });
+      }
+
+      validate() {
+          if (this.constantFrustration && this.constantEaseOfUse && this.constantAccuracy && this.accelerationFrustration && this.accelerationEaseOfUse && this.accelerationAccuracy && this.rubberedgeFrustration && this.rubberedgeEaseOfUse && this.rubberedgeAccuracy && this.preference) {
+              this.$.submit.disabled = false;
+          }
+          else {
+              this.$.submit.disabled = true;
+          }
       }
 
       _next() {

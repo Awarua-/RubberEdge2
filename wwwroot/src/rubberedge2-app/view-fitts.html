@@ -136,7 +136,6 @@ class ViewFitts extends Polymer.Element {
             }
         }
         this.combinations = this._shuffleArray(this.combinations);
-        console.log(this.combinations);
     }
 
     _pageUpdate() {
@@ -271,9 +270,7 @@ class ViewFitts extends Polymer.Element {
     }
 
     _updateISOCircles() {
-
         let params = this.pop('combinations');
-        console.log("params: " + params);
         if (params === undefined) {
             this.dispatchEvent(new CustomEvent('next', {bubbles: true, composed: true}));
             return;

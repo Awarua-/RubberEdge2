@@ -185,7 +185,7 @@ class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
                         {
                             "page": "wait",
                             "data": {
-                                "message": "First lets do some training using the Constant function.<br>Use the interface to move the cursor to the red circle.<br>When the pointer is in the circle release the pointer, and a new target will appear.",
+                                "message": "First lets do some training using the Constant function. Use the interface to move the cursor to the red circle. When the pointer is in the circle release the pointer, and a new target will appear.",
                                 "time": 15
                             }
                         },
@@ -285,7 +285,6 @@ class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
         this.addEventListener('next', e => this._nextPage(e));
         this.addEventListener('reset', e => this._reset(e));
         this.addEventListener('newParticipant', e => this._newParticipant(e));
-        console.log(this.steps);
     }
 
     _log(log) {
@@ -370,8 +369,8 @@ class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
             {
                 "page": "wait",
                 "data": {
-                    "message": "Acceleration function.",
-                    "time": 15
+                    "message": "Yay, take a break, before moving onto the Acceleration function.",
+                    "time": 30
                 }
             },
             {
@@ -386,7 +385,7 @@ class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
                 "page": "wait",
                 "data": {
                     "message": "You're almost there, last one, Constant function.",
-                    "time": 15
+                    "time": 30
                 }
             },
             {
@@ -408,18 +407,18 @@ class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
                 }
             },
             {
-                "page": "wait",
-                "data": {
-                    "message": "Acceleration function.",
-                    "time": 15
-                }
-            },
-            {
                 "page": "fitts",
                 "data": {
                     "transferFunction": "system",
                     "widths": [25, 50, 75],
                     "distances": [500, 750, 1000]
+                }
+            },
+            {
+                "page": "wait",
+                "data": {
+                    "message": "Yay, take a break before moving onto the RubberEdge function.",
+                    "time": 15
                 }
             },
             {
@@ -434,7 +433,7 @@ class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
                 "page": "wait",
                 "data": {
                     "message": "You're almost there, last one, Constant function.",
-                    "time": 15
+                    "time": 30
                 }
             },
             {
@@ -466,8 +465,8 @@ class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
             {
                 "page": "wait",
                 "data": {
-                    "message": "Acceleration function.",
-                    "time": 15
+                    "message": "Yay, take a break before moving onto the Acceleration function.",
+                    "time": 30
                 }
             },
             {
@@ -482,7 +481,7 @@ class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
                 "page": "wait",
                 "data": {
                     "message": "You're almost there, last one, RubberEdge function.",
-                    "time": 15
+                    "time": 30
                 }
             },
             {

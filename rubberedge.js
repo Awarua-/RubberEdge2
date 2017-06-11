@@ -17,9 +17,9 @@ class RubberEdge {
         }
 
         // Mapping to transfer functions
-        this.transferFunctions = [{"name": "system", "function": this._composeFunction("system:?slider=-2&epp=true"), "active": true},
-                                     {"name": "constant", "function": this._composeFunction("constant:?cdgain=1"), "active": false},
-                                {"name": "rubberedge", "function": this._composeFunction("constant:?cdgain=1"), "active": false}];
+        this.transferFunctions = [{"name": "system", "function": this._composeFunction("system:?slider=0&epp=true"), "active": true},
+                                     {"name": "constant", "function": this._composeFunction("constant:?cdgain=2"), "active": false},
+                                {"name": "rubberedge", "function": this._composeFunction("constant:?cdgain=2"), "active": false}];
 
         this.callback = cb;
         this.input = new pointing.PointingDevice("any:?debugLevel=1");
@@ -38,6 +38,7 @@ class RubberEdge {
         this.elasticUpdateFrequency = 40;
         this.elasticVelocity = {dx: 0, dy: 0};
         this.movementHistory = [];
+        this.limit = 20;
     }
 
     _composeFunction(uri) {
@@ -94,8 +95,11 @@ class RubberEdge {
                         let vfx = this.elasticVelocity.vx + vx;
                         let vfy = this.elasticVelocity.vy + vy;
 
-                        //console.log("vfx: " + vfx);
-                        //console.log("vfy: " + vfy);
+                        vfx = this.limitValue(vfx, this.limit);
+                        vfy = this.limitValue(vfy, this.limit);
+
+                        // console.log("vfx: " + vfx);
+                        // console.log("vfy: " + vfy);
 
                         this.elasticVelocity.vx = vfx;
                         this.elasticVelocity.vy = vfy;
@@ -263,6 +267,15 @@ class RubberEdge {
 
     getTransferFunctions() {
         return this.transferFunctions;
+    }
+
+    limitValue(x, limit) {
+        if (x > 0) {
+            return Math.min(x, +limit);
+        }
+        else {
+            return Math.max(x, -limit);
+        }
     }
 
 }
