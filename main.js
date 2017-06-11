@@ -12,6 +12,11 @@ let messageHandler = (message) => {
         console.error('Expected the message to have type');
         return;
     }
+    if (!message.data) {
+        console.log(message);
+        console.error('Expected the message to contain data');
+        return;
+    }
     switch(message.type) {
         case 'touch':
             rubberEdge.updatePosition(message.data);

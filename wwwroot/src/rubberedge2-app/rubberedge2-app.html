@@ -88,8 +88,8 @@
               <view-instructions name="instructions" participant-id="[[participantId]]"></view-instructions>
               <view-presurvey name="presurvey" participant-id="[[participantId]]"></view-presurvey>
               <view-calibration name="calibration"></view-calibration>
-              <view-fitts name="fitts" mouse="[[mouse]]" log="{{log}}" page-data="{{pageData}}"></view-fitts>
-              <view-wait name="wait" page-data="{{pageData}}"></view-wait>
+              <view-fitts name="fitts" page="[[page]]" mouse="[[mouse]]" log="{{log}}" page-data="{{pageData}}"></view-fitts>
+              <view-wait name="wait" page="[[page]]" page-data="{{pageData}}"></view-wait>
               <view-postsurvey name="postsurvey"></view-postsurvey>
               <view-thanks name="thanks"></view-thanks>
               <view-404 name="lolcat"></view-404>
@@ -122,7 +122,7 @@
     last-response="{{participantId}}"></iron-ajax>
 
 
-    <websocket-component id="websocket" url="{{urlWS}}" auto></websocket-component>
+    <websocket-component id="websocket" url="{{urlWS}}" auto handle-visibility></websocket-component>
 </template>
 
 <script>
@@ -170,113 +170,61 @@ class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
             },
             steps: {
                 type: Array,
-                value: [{
-                    "page": "instructions",
-                    "data": {}
-                },
-                {
-                    "page": "presurvey",
-                    "data": {}
-                },
-                {
-                    "page": "calibration",
-                    "data": {}
-                },
-                {
-                    "page": "wait",
-                    "data": {
-                        "message": "First lets do some training using the Constant function."
-                    }
-                },
-                {
-                    "page": "fitts",
-                    "data": {
-                        "transferFunction": "constant",
-                        "widths": [50],
-                        "distances": [750]
-                    }
-                },
-                {
-                    "page": "wait",
-                    "data": {
-                        "message": "Training with Acceleration Function"
-                    }
-                },
-                {
-                    "page": "fitts",
-                    "data": {
-                        "transferFunction": "system",
-                        "widths": [50],
-                        "distances": [750]
-                    }
-                },
-                {
-                    "page": "wait",
-                    "data": {
-                        "message": "Training with the new function, RubberEdge."
-                    }
-                },
-                {
-                    "page": "fitts",
-                    "data": {
-                        "transferFunction": "rubberedge",
-                        "widths": [50],
-                        "distances": [750]
-                    }
-                },
-                {
-                    "page": "wait",
-                    "data": {
-                        "message": "Ok, this time its for real, starting with the RubberEdge function."
-                    }
-                },
-                {
-                    "page": "fitts",
-                    "data": {
-                        "transferFunction": "rubberedge",
-                        "widths": [25, 50, 75],
-                        "distances": [500, 750, 1000]
-                    }
-                    }
-                },
-                {
-                    "page": "wait",
-                    "data": {
-                        "message": "Acceleration function."
-                    }
-                },
-                {
-                    "page": "fitts",
-                    "data": {
-                        "transferFunction": "system",
-                        "widths": [25, 50, 75],
-                        "distances": [500, 750, 1000]
-                    }
-                    }
-                },
-                {
-                    "page": "wait",
-                    "data": {
-                        "message": "You're almost there, last one, Constant function."
-                    }
-                },
-                {
-                    "page": "fitts",
-                    "data": {
-                        "transferFunction": "constant",
-                        "widths": [25, 50, 75],
-                        "distances": [500, 750, 1000]
-                    }
-                    }
-                },
-                {
-                    "page": "postsurvey",
-                    "data": {}
-                },
-                {
-                    "page": "thanks",
-                    "data": {}
-                }]
+                value: [        {
+                            "page": "instructions",
+                            "data": {}
+                        },
+                        {
+                            "page": "presurvey",
+                            "data": {}
+                        },
+                        {
+                            "page": "calibration",
+                            "data": {}
+                        },
+                        {
+                            "page": "wait",
+                            "data": {
+                                "message": "First lets do some training using the Constant function.<br>Use the interface to move the cursor to the red circle.<br>When the pointer is in the circle release the pointer, and a new target will appear.",
+                                "time": 15
+                            }
+                        },
+                        {
+                            "page": "fitts",
+                            "data": {
+                                "transferFunction": "constant",
+                                "widths": [50],
+                                "distances": [750]
+                            }
+                        },
+                        {
+                            "page": "wait",
+                            "data": {
+                                "message": "Training with Acceleration Function"
+                            }
+                        },
+                        {
+                            "page": "fitts",
+                            "data": {
+                                "transferFunction": "system",
+                                "widths": [50],
+                                "distances": [750]
+                            }
+                        },
+                        {
+                            "page": "wait",
+                            "data": {
+                                "message": "Training with the new function, RubberEdge."
+                            }
+                        },
+                        {
+                            "page": "fitts",
+                            "data": {
+                                "transferFunction": "rubberedge",
+                                "widths": [50],
+                                "distances": [750]
+                            }
+                        }]
             }
         };
     }
@@ -328,6 +276,7 @@ class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
 
     ready() {
         super.ready();
+        this._buildSteps();
         location = "#/instructions";
         // Load the 404 page incase of error.
         this._pageChanged('lolcat');
@@ -336,11 +285,14 @@ class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
         this.addEventListener('next', e => this._nextPage(e));
         this.addEventListener('reset', e => this._reset(e));
         this.addEventListener('newParticipant', e => this._newParticipant(e));
+        console.log(this.steps);
     }
 
     _log(log) {
-        log.participantId = this.participantId;
-        this.$.websocket.send(JSON.stringify(log));
+        let message = log.value;
+        message.participantId = this.participantId;
+        message.type = 'log';
+        this.$.websocket.send(JSON.stringify(message));
     }
 
     _computeWSUrl(port) {
@@ -394,6 +346,163 @@ class Rubberedge2App extends Polymer.LazyImportsMixin(Polymer.Element) {
             this.stepIndex = 0;
             return this.steps[this.stepIndex++];
         }
+    }
+
+    _buildSteps() {
+        let remainder = this.participantId % 3;
+        if (remainder == 0) {
+            this.push('steps',
+            {
+                "page": "wait",
+                "data": {
+                    "message": "Ok, this time its for real, starting with the RubberEdge Function",
+                    "time": 15
+                }
+            },
+            {
+                "page": "fitts",
+                "data": {
+                    "transferFunction": "rubberedge",
+                    "widths": [25, 50, 75],
+                    "distances": [500, 750, 1000]
+                }
+            },
+            {
+                "page": "wait",
+                "data": {
+                    "message": "Acceleration function.",
+                    "time": 15
+                }
+            },
+            {
+                "page": "fitts",
+                "data": {
+                    "transferFunction": "system",
+                    "widths": [25, 50, 75],
+                    "distances": [500, 750, 1000]
+                }
+            },
+            {
+                "page": "wait",
+                "data": {
+                    "message": "You're almost there, last one, Constant function.",
+                    "time": 15
+                }
+            },
+            {
+                "page": "fitts",
+                "data": {
+                    "transferFunction": "constant",
+                    "widths": [25, 50, 75],
+                    "distances": [500, 750, 1000]
+                }
+            });
+        }
+        else if (remainder == 1) {
+            this.push('steps',
+            {
+                "page": "wait",
+                "data": {
+                    "message": "Ok, this time its for real, starting with the Acceleration Function",
+                    "time": 15
+                }
+            },
+            {
+                "page": "wait",
+                "data": {
+                    "message": "Acceleration function.",
+                    "time": 15
+                }
+            },
+            {
+                "page": "fitts",
+                "data": {
+                    "transferFunction": "system",
+                    "widths": [25, 50, 75],
+                    "distances": [500, 750, 1000]
+                }
+            },
+            {
+                "page": "fitts",
+                "data": {
+                    "transferFunction": "rubberedge",
+                    "widths": [25, 50, 75],
+                    "distances": [500, 750, 1000]
+                }
+            },
+            {
+                "page": "wait",
+                "data": {
+                    "message": "You're almost there, last one, Constant function.",
+                    "time": 15
+                }
+            },
+            {
+                "page": "fitts",
+                "data": {
+                    "transferFunction": "constant",
+                    "widths": [25, 50, 75],
+                    "distances": [500, 750, 1000]
+                }
+            });
+        }
+        else if (remainder == 2) {
+            this.push('steps',
+            {
+                "page": "wait",
+                "data": {
+                    "message": "Ok, this time its for real, starting with the Constant Function",
+                    "time": 15
+                }
+            },
+            {
+                "page": "fitts",
+                "data": {
+                    "transferFunction": "constant",
+                    "widths": [25, 50, 75],
+                    "distances": [500, 750, 1000]
+                }
+            },
+            {
+                "page": "wait",
+                "data": {
+                    "message": "Acceleration function.",
+                    "time": 15
+                }
+            },
+            {
+                "page": "fitts",
+                "data": {
+                    "transferFunction": "system",
+                    "widths": [25, 50, 75],
+                    "distances": [500, 750, 1000]
+                }
+            },
+            {
+                "page": "wait",
+                "data": {
+                    "message": "You're almost there, last one, RubberEdge function.",
+                    "time": 15
+                }
+            },
+            {
+                "page": "fitts",
+                "data": {
+                    "transferFunction": "rubberedge",
+                    "widths": [25, 50, 75],
+                    "distances": [500, 750, 1000]
+                }
+            });
+        }
+
+        this.push('steps', {
+            "page": "postsurvey",
+            "data": {}
+        },
+        {
+            "page": "thanks",
+            "data": {}
+        });
     }
     }
     window.customElements.define(Rubberedge2App.is, Rubberedge2App);

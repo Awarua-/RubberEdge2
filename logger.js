@@ -96,6 +96,7 @@ class Logger {
             console.log(error);
             return false;
         });
+        return this.currentParticipantId;
     }
 
     log(data) {

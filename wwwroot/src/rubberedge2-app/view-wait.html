@@ -29,10 +29,10 @@
 
 
   <div id="content">
-      <iron-timer id="timer" start-time="5" current-time="{{currentTime}}" on-iron-timer-end="_next">[[currentTime]]</iron-timer>
+      <iron-timer id="timer" start-time="{{startTime}}" current-time="{{currentTime}}" on-iron-timer-end="_next">[[currentTime]]</iron-timer>
   </div>
   <p class="message">
-      {{pageData.Message}}
+      {{pageData.message}}
   </p>
   </template>
 
@@ -45,6 +45,11 @@
           // Polymer.Element#rootPath
           rootPath: String,
           currentTime: Number,
+          startTime: {
+              type: Number,
+              value: 5,
+              notify: true
+          },
           pageData: {
               type: Object,
               observer: '_pageUpdate'
@@ -53,16 +58,18 @@
       }
       ready() {
           super.ready();
-          this.$.timer.start();
       }
       _next() {
         this.dispatchEvent(new CustomEvent('next', {bubbles: true, composed: true}));
       }
-      _pageUpdate() {
-          this.$.timer.reset();
-          let time = this.pageData.time || 5;
-          this.$.timer.startTime = time;
-          this.$.timer.start();
+      _pageUpdate(newValue) {
+          if (this.page === 'wait') {
+              let time = newValue.time || 5;
+              this.startTime = time;
+              console.log(this.startTime);
+              this.$.timer.reset();
+              this.$.timer.start();
+        }
       }
     }
     window.customElements.define(ViewWait.is, ViewWait);

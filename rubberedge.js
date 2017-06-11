@@ -72,7 +72,7 @@ class RubberEdge {
             this.movementHistory.push(data);
 
             //TODO fix hard coded string
-            if (this.selectedFunction = "rubberedge") {
+            if (this.selectedFunction === "rubberedge") {
 
                 // conditions
                 // Enter elastic zone for the first time
@@ -83,19 +83,19 @@ class RubberEdge {
                     if (this.elasticState && data.eventType != 'touchEnd') {
                     //TODO apply momentum
                     // Workout the difference between
-                        console.log("dx: " + data.dx);
-                        console.log("dy: " + data.dy);
+                        //console.log("dx: " + data.dx);
+                        //console.log("dy: " + data.dy);
                         let vx = data.dx * this.accelerationConstant;
                         let vy = data.dy * this.accelerationConstant;
 
-                        console.log("vx: " + vx);
-                        console.log("vy: " + vy);
+                        //console.log("vx: " + vx);
+                        //console.log("vy: " + vy);
 
                         let vfx = this.elasticVelocity.vx + vx;
                         let vfy = this.elasticVelocity.vy + vy;
 
-                        console.log("vfx: " + vfx);
-                        console.log("vfy: " + vfy);
+                        //console.log("vfx: " + vfx);
+                        //console.log("vfy: " + vfy);
 
                         this.elasticVelocity.vx = vfx;
                         this.elasticVelocity.vy = vfy;

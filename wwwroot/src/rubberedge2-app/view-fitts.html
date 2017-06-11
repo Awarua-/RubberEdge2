@@ -136,14 +136,19 @@ class ViewFitts extends Polymer.Element {
             }
         }
         this.combinations = this._shuffleArray(this.combinations);
+        console.log(this.combinations);
     }
 
     _pageUpdate() {
-        this._setTransferFunction();
-        if (!this.firstLoad) {
-            this._generateCombinations();
-            this._updateISOCircles();
-            this._resetCursor();
+        if (this.page === 'fitts') {
+            this.set('widths', this.pageData.widths);
+            this.set('distances', this.pageData.distances);
+            this._setTransferFunction();
+            if (!this.firstLoad) {
+                this._generateCombinations();
+                this._updateISOCircles();
+                this._resetCursor();
+            }
         }
     }
 
@@ -194,8 +199,10 @@ class ViewFitts extends Polymer.Element {
     }
 
     _mouseClicked(x, y) {
-
-        if (this._distance({x: x, y: y}, this.target) < (this.target.w / 2)) {
+        let distance = this._distance({x: x, y: y}, this.target),
+            logEvent = {eventType: 'experiment', x: x, y: y, t: (new Date).getTime(), d: this.target.distance, tr: this.target.w, tx: this.target.x, ty: this.target.y, td: distance};
+        if (distance < (this.target.w / 2)) {
+            logEvent.miss = false;
             //FIXME record data like below
             // this.addDataPoint({start: this.start,
             //                    target: this.target,
@@ -207,6 +214,8 @@ class ViewFitts extends Polymer.Element {
                 // this.currentPosition = 0;
                 this._updateISOCircles();
                 this.active = false;
+                this.set('log', {data: {misses: this.miss, eventType: 'experiment'}});
+                this.miss = 0;
             }
             else {
                 this.currentCount++;
@@ -215,7 +224,9 @@ class ViewFitts extends Polymer.Element {
         }
         else {
             this.miss++;
+            logEvent.miss = true;
         }
+        this.set('log', {data: logEvent});
     }
 
     _removeTarget() {
@@ -262,6 +273,7 @@ class ViewFitts extends Polymer.Element {
     _updateISOCircles() {
 
         let params = this.pop('combinations');
+        console.log("params: " + params);
         if (params === undefined) {
             this.dispatchEvent(new CustomEvent('next', {bubbles: true, composed: true}));
             return;
@@ -341,7 +353,7 @@ class ViewFitts extends Polymer.Element {
          * Using Durstenfeld shuffle algorithm.
          */
         _shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
+            for (let i = array.length - 1; i >= 0; i--) {
                 let j = Math.floor(Math.random() * (i + 1));
                 let temp = array[i];
                 array[i] = array[j];

@@ -32,7 +32,7 @@
           font-size: 18pt;
       }
 
-      .likert {
+      .likert .preference {
           @apply --layout-horizontal;
       }
 
@@ -178,6 +178,14 @@
                         <paper-textarea label="Other feedback or comments with regard to the RubberEdge function"></paper-textarea>
                     </div>
                     <paper-divider margin></paper-divider>
+                    <p class="question">
+                        What was your preferred pointer function?
+                    </p>
+                    <paper-radio-group class="preference" label="Preference" attr-for-selected="value" multi="false">
+                        <paper-radio-button name="preference" value="Constant">Constant Function</paper-radio-button>
+                        <paper-radio-button name="preference" value="Acceleration">Acceleration Function</paper-radio-button>
+                        <paper-radio-button name="preference" value="RubberEdge" checked>RubberEdge Function</paper-radio-button>
+                    </paper-radio-group>
                     <paper-textarea label="Additional feedback or questions"></paper-textarea>
             </form>
         </iron-form>
@@ -201,7 +209,6 @@
       ready() {
           super.ready();
           this.$.form.addEventListener('iron-form-presubmit', (event) => {
-              console.log("yay");
               this.$.form.request.body['eventType'] = 'postsurvey';
               this.$.form.request.body['participantId'] = this.participantId;
           });
@@ -209,7 +216,6 @@
 
       _next() {
         this.$.form.submit();
-        console.log("test");
         this.dispatchEvent(new CustomEvent('next', {bubbles: true, composed: true}));
       }
 
