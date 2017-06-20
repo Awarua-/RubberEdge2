@@ -79,7 +79,10 @@ class ViewFitts extends Polymer.Element {
             active: Boolean,
             currentPosition: Number,
             currentCount: Number,
-            miss: Number,
+            miss: {
+                type: Number,
+                value: 0
+            },
             widths: {
                 type: Array,
                 value: [50]
@@ -199,7 +202,7 @@ class ViewFitts extends Polymer.Element {
 
     _mouseClicked(x, y) {
         let distance = this._distance({x: x, y: y}, this.target),
-            logEvent = {eventType: 'experiment', x: x, y: y, t: (new Date).getTime(), d: this.target.distance, tr: this.target.w, tx: this.target.x, ty: this.target.y, td: distance};
+            logEvent = {eventType: 'experiment', function: this.pageData.transferFunction, x: x, y: y, t: (new Date).getTime(), d: this.target.distance, tr: this.target.w, tx: this.target.x, ty: this.target.y, td: distance};
         if (distance < (this.target.w / 2)) {
             logEvent.miss = false;
             //FIXME record data like below

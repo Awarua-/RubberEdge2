@@ -205,5 +205,8 @@ $RECYCLE.BIN/
 # End of https://www.gitignore.io/api/osx,node,linux,bower,windows,polymer,intellij,visualstudiocode
 
 results/
+processed/
 
+scripts/__pycache__
+scripts/Rplots.pdf
 git.html
