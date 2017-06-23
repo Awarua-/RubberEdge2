@@ -66,8 +66,8 @@ ggsave("../processed/selection-time.png")
 
 f <- ggplot(fitts_grouped, aes(x = index, y = mean, colour = int)) +
     geom_point() +
+    scale_colour_manual(values = cbb_palette) +
     geom_smooth(method = "lm", se = FALSE) +
-    scale_fill_manual(values = cbb_palette) +
     labs(colour = "Function", x = "Index of Difficulty",
     y = "Mean Time (s)") +
     theme(panel.grid.major.x = element_blank(),
@@ -86,7 +86,7 @@ f <- ggplot(fitts_grouped, aes(x = index, y = mean, colour = int,
     shape = distance)) +
     geom_point() +
     geom_smooth(method = "lm", se = FALSE) +
-    scale_fill_manual(values = cbb_palette) +
+    scale_colour_manual(values = cbb_palette) +
     labs(colour = "Function", shape = "Distance", x = "Index of Difficulty",
     y = "Mean Time (s)") +
     theme(panel.grid.major.x = element_blank(),

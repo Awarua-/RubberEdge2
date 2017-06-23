@@ -1,6 +1,8 @@
 import json, os, config
 from clutch_results import clutch
 from timing_results import timing
+from survey_results import survey
+
 def read_data(dir, file_name):
     path = os.path.join(dir, file_name)
     with open(path) as file:
@@ -113,6 +115,7 @@ def main():
 
     clutch(output)
     timing(output)
+    survey(output)
 
 if __name__ == '__main__':
     main()
