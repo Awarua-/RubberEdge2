@@ -32,6 +32,18 @@ upper = mean + se)
 
 results
 
+distance <- ddply(data, c("distance"), summarise, mean = mean(time),
+sd = sd(time), se = sd / sqrt(length(time)), lower = mean - se,
+upper = mean + se)
+
+distance
+
+func <- ddply(data, c("int"), summarise, mean = mean(time),
+sd = sd(time), se = sd / sqrt(length(time)), lower = mean - se,
+upper = mean + se)
+
+func
+
 fitts <- ddply(data, c("int", "index"), summarise, mean = mean(time))
 fit <-  lmList(mean ~ index | int, data = fitts)
 sumfun(fit)
