@@ -1,0 +1,17 @@
+\section{Background and Related Work}
+
+This work is based on the initial work done in the RubberEdge paper\cite{Casiez2007RubberEdge}, where this paper is evaluating a more advanced version of their prototype design for RubberEdge. Conditions have changed in touchpads and screen interaction since the paper was published. Specifically the introduction of high-resolution 4k displays and display scaling as well as newer pointer acceleration curves and larger touch pads.
+
+From the perspective of a touchpad user, we still using clutching in our everyday interactions. So despite the growing size of trackpads clutching still occurs. Whether or not clutching is bad is debatable \cite{Nancel2015ClutchingEnemy} argues that pointer movements are possible without clutching but is detrimental for target selection time and induces more errors. So some clutching is beneficial, and it is not solely caused by a lack of touchpad space.
+
+Over the years touch pads have increased in their overall size, this is likely due to the increasing availability of gestures. However, it is noted that there is no significant improvement in the usability for pointing tasks when using a larger touchpad over a smaller one\cite{Avera2016EffectsPerformance}. The size of the touchpad may impact the type of gestures that can be used.
+
+The density of screens has increased, with it now being common to see laptops with resolutions of 4k (3840 x 2160) or greater on the market. There is also a larger variety of screen aspect ratios, with 16:9 remaining dominate, also significant is 16:10 on MacBooks\cite{MacBookProNZ} and 3:2 on Microsoft's Surface\cite{SurfaceBeauty} line of products having a significant share of the market. However, the increased resolution is offset by the use of display scaling; this means the effective resolution is a lot lower than the native resolution, often it is between 1080p and 1440p.
+
+The current methods for user input are; fixed ratio of display movement to control movement \gls{CD} (a scaling factor, 1mm movement on the touchpad equates to x number of pixels moved in the same direction). The alternative is pointer cursor acceleration, which depends on the velocity of the input on the touchpad. A low velocity equates to a low \gls{CD} gain this improves pointer precision and a high \gls{CD} gain at high velocity, to cover a large distance while minimise clutching.
+
+For hybrid position and rate control techniques, it was found that without haptic feedback transitioning between position and rate mode was difficult to distinguish. However, elastic feedback is well suited to rate control.
+
+Three types of input devices, isotonic, isometric and elastic. Isotonic free moving uses position input (mouse, touchpad). Isometric devices (TrackPoint)\cite{ZhaiHumanControl} do not move and use force for input. In between these two device types are elastic devices, which use a mix of force and position for input.
+
+RubberEdge is a hybrid between isotonic and isometric, where there is an isotonic zone for precise input, and an isometric or elastic zone, for use when faster pointer movement is required, which provides force feedback relative to the acceleration of the pointer.
